@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.ggmarket.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -25,7 +25,6 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Pedido> pedidos;
-
 }
 
 enum Rol {

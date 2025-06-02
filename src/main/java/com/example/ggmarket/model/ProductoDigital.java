@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.ggmarket.model;
 
 import java.util.List;
 
@@ -18,9 +18,11 @@ public class ProductoDigital {
     private String descripcion;
     private Double precio;
     private Integer stock;
-
+    private String categoria;
+    @Column(name = "imagen_url")
+    private String imagenUrl;
     @OneToMany(mappedBy = "productoDigital")
     private List<ClaveDigital> claves;
 
-    // Getters and setters
+    
 }

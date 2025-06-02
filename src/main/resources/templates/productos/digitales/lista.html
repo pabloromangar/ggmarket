@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Productos digitales</title>
+    <link rel="stylesheet" href="../css/custom.css">
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <h2>Productos Digitales</h2>
+
+    <a href="/productos/digitales/nuevo">Nuevo Producto Digital</a>
+    <table border="1" class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Categoría</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${productos}">
+                <td th:text="${p.id}">1</td>
+                <td th:text="${p.nombre}">Nombre</td>
+                <td th:text="${p.descripcion}">Descripción</td>
+                <td th:text="${p.precio}">0.0</td>
+                <td th:text="${p.stock}">0</td>
+                <td th:text="${p.categoria}">Categoria</td>
+                <td>
+                    <a th:href="@{'/productos/digitales/editar/' + ${p.id}}">Editar</a> |
+                    <a th:href="@{'/productos/digitales/eliminar/' + ${p.id}}">Eliminar</a> |
+                    <a th:href="@{'/productos/digitales/' + ${p.id} + '/importar-claves'}">Importar Claves</a>
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

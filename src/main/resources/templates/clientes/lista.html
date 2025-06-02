@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Productos</title>
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container my-5">
+        <h2 class="mb-4">Catálogo de Productos</h2>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col" th:each="producto : ${productos.content}">
+                <div class="card h-100">
+                    <img th:src="${producto.imagenUrl}" class="card-img-top" alt="Imagen"
+                        onerror="this.src='img/default.webp'">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${producto.nombre}"></h5>
+                        <p class="card-text" th:text="${producto.descripcion}"></p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
+                        <a th:href="@{/productos/digitales/{id}(id=${producto.id})}"
+                            class="btn btn-sm btn-primary">Ver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div>
+            <span th:text="'Página ' + ${productos.number + 1} + ' de ' + ${productos.totalPages}"></span>
+            <a th:if="${!productos.first}" th:href="@{/productosDigitales(page=${productos.number - 1})}">Anterior</a>
+            <a th:if="${!productos.last}" th:href="@{/productosDigitales(page=${productos.number + 1})}">Siguiente</a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>
