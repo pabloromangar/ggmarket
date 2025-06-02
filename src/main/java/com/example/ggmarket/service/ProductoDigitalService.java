@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductoDigitalService {
@@ -40,8 +39,9 @@ public class ProductoDigitalService {
         return repo.findAll();
     }
 
-    public Optional<ProductoDigital> findById(Long id) {
-        return repo.findById(id);
+    public ProductoDigital findById(Long id) {
+        ProductoDigital producto = repo.findById(id).orElse(null);
+        return producto;
     }
 
     public ProductoDigital save(ProductoDigital producto) {

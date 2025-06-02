@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Formulario Producto Digital</title>
-    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../../css/custom.css">
 
 </head>
-<div th:replace="fragment/header :: header"></div>
+    <div th:replace="fragments/header :: header"></div>
 <body>
 <h2 th:text="${producto.id == null} ? 'Nuevo Producto Digital' : 'Editar Producto Digital'"></h2>
 

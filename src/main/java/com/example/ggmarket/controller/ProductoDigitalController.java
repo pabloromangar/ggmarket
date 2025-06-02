@@ -12,12 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/productos/digitales")
@@ -34,6 +32,8 @@ public class ProductoDigitalController {
         return "productos/digitales/lista";
     }
 
+   
+
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("producto", new ProductoDigital());
@@ -42,13 +42,13 @@ public class ProductoDigitalController {
 
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute ProductoDigital producto) {
-        productoDigitalService.save(producto);
+        productoDigitalService.crearProducto(producto);
         return "redirect:/productos/digitales";
     }
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        var producto = productoDigitalService.findById(id).orElseThrow();
+        var producto = productoDigitalService.findById(id);
         model.addAttribute("producto", producto);
         return "productos/digitales/formulario";
     }
@@ -61,7 +61,7 @@ public class ProductoDigitalController {
 
     @PostMapping("/{id}/claves")
     public String subirClaves(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        ProductoDigital producto = productoDigitalService.findById(id).orElseThrow();
+        ProductoDigital producto = productoDigitalService.findById(id);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             List<ClaveDigital> claves = new ArrayList<>();
             String linea;
@@ -92,12 +92,10 @@ public class ProductoDigitalController {
     }
 
     @GetMapping("/{id}/importar-claves")
-public String mostrarFormularioImportacion(@PathVariable Long id, Model model) {
-    ProductoDigital producto = productoDigitalService.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    model.addAttribute("producto", producto);
-    return "productos/digitales/importar_claves";
-}
-
+    public String mostrarFormularioImportacion(@PathVariable Long id, Model model) {
+        ProductoDigital producto = productoDigitalService.findById(id);
+        model.addAttribute("producto", producto);
+        return "productos/digitales/importar_claves";
+    }
 
 }

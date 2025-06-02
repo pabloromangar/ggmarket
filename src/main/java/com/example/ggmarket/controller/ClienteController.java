@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.ggmarket.model.ProductoDigital;
@@ -27,6 +28,13 @@ public class ClienteController {
         Page<ProductoDigital> productos = productoDigitalService.obtenerProductos(PageRequest.of(page, 10));
         model.addAttribute("productos", productos);
         return "clientes/lista";
+    }
+
+     @GetMapping("/productoDigital/{id}")
+    public String verProducto(@PathVariable Long id, Model model) {
+        ProductoDigital producto = productoDigitalService.findById(id);
+        model.addAttribute("producto", producto);
+        return "clientes/productoDigital";
     }
 
 }

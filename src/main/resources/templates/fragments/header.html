@@ -1,45 +1,65 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="header">
 
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="css/custom.css">
+  <!-- Barra superior (igual que antes) -->
+  <div class="bg-primary text-white shadow-sm py-2 px-4 d-flex align-items-center justify-content-between">
+    <a class="d-flex align-items-center text-white text-decoration-none" th:href="@{/}">
+      <img src="/images/logo.png" alt="GG" style="height: 30px; margin-right: 10px;">
+      <span class="fw-bold fs-4">GG Market</span>
+    </a>
 
-</head>
+    <form class="flex-grow-1 mx-4" style="max-width: 600px;">
+      <input type="text" id="buscador" class="form-control form-control-lg rounded-pill px-4"
+             placeholder="🔍 Buscar productos digitales...">
+      <div id="resultados"
+           class="position-absolute bg-white text-dark border border-primary rounded shadow mt-2"
+           style="display: none; width: 100%; max-height: 200px; overflow-y: auto; z-index: 100;">
+      </div>
+    </form>
 
-<body>
-    <div th:fragment="header">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container-fluid">
-                <a class="navbar-brand" th:href="@{/}">GG Market</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/productos/digitales}">Productos Digitales</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/usuarios}">Usuarios</a>
-                        </li>
-                        <!-- Agrega más enlaces según necesites -->
-                    </ul>
-                    <input type="text" id="buscador" placeholder="Buscar productos digitales..." />
-                    <div id="resultados"
-                        style="border: 1px solid #ccc; display: none; position: absolute; background: white; width: 300px; max-height: 200px; overflow-y: auto; z-index: 100;">
-                    </div>
-                </div>
-                <div id="overlay"
-                    style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 50;">
-                </div>
-            </div>
-        </nav>
+    <div class="d-flex gap-3">
+      <button type="button" class="btn btn-outline-light position-relative">
+        🛒
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          3
+          <span class="visually-hidden">items en carrito</span>
+        </span>
+      </button>
+      <a href="#" class="btn btn-outline-light">Iniciar sesión</a>
+      <a href="#" class="btn btn-outline-light">Registrarse</a>
     </div>
-    <div id="overlay"
-        style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 50;">
-    </div>
-</body>
+  </div>
 
-</html>
+  <!-- Barra inferior con categorías y botón "Categorías" -->
+  <nav class="navbar navbar-expand bg-secondary rounded-0 shadow-sm">
+    <div class="container-fluid px-4 d-flex align-items-center">
+      <a href="#" class="text-white text-decoration-none fw-semibold me-4"
+         data-bs-toggle="offcanvas" data-bs-target="#offcanvasCategorias" aria-controls="offcanvasCategorias">
+        📂 Categorías
+      </a>
+
+      <div class="d-flex gap-4 flex-wrap">
+        <a href="#" class="text-white text-decoration-none fw-semibold">🎮 Juegos Baratos</a>
+        <a href="#" class="text-white text-decoration-none fw-semibold">💻 Códigos de Windows</a>
+        <a href="#" class="text-white text-decoration-none fw-semibold">🌙 NightReign</a>
+        <a href="#" class="text-white text-decoration-none fw-semibold">💳 Tarjetas</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Offcanvas: barra lateral izquierda con categorías -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCategorias" aria-labelledby="offcanvasCategoriasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title fw-bold" id="offcanvasCategoriasLabel">Categorías</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <nav class="nav flex-column">
+        <a href="#" class="nav-link">🎮 Juegos Baratos</a>
+        <a href="#" class="nav-link">💻 Códigos de Windows</a>
+        <a href="#" class="nav-link">🌙 NightReign</a>
+        <a href="#" class="nav-link">💳 Tarjetas</a>
+      </nav>
+    </div>
+  </div>
+
+</div>
