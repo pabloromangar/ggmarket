@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductoDigitalRepository extends JpaRepository<ProductoDigital, Long> {
-    List<ProductoDigital> findByCategoriaContainingIgnoreCase(String categoria);
+    List<ProductoDigital> findByTipoContainingIgnoreCase(String tipo);
     List<ProductoDigital> findByNombreContainingIgnoreCase(String nombre);
 
 }

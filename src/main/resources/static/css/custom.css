@@ -11855,4 +11855,123 @@ textarea.form-control-lg {
   }
 }
 
+.custom-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-card .card-img-top {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.custom-card .platform-badge {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  z-index: 2;
+}
+
+.custom-card .card-content {
+  position: relative;
+  transition: transform 0.4s ease-in-out;
+  z-index: 1;
+}
+
+.custom-card .card-body,
+.custom-card .card-footer {
+  background: white; /* O el color que estés usando */
+  transition: transform 0.4s ease-in-out;
+}
+
+.custom-card .card-actions {
+  position: absolute;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+  z-index: 0;
+}
+
+.custom-card .card-actions button {
+  width: 80%;
+  margin: 0.25rem auto;
+  display: block;
+}
+
+.custom-card:hover .card-content {
+  transform: translateY(-30%);
+}
+
+.custom-card:hover .card-actions {
+  bottom: 10px;
+  opacity: 1;
+}
+  .custom-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Contenedor desplazable */
+.card-body {
+  background-color: #fff;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+/* Footer puede ir junto, o eliminar si lo incluyes en card-body */
+.card-footer {
+  background-color: #fff;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+
+.btn-carrito:hover{
+  color:white;
+}
+/* Botones ocultos al principio */
+.card-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem 1rem;
+  background: white;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.4s ease;
+}
+
+/* Hover: mueve contenido arriba y muestra botones */
+.custom-card:hover .card-body,
+.custom-card:hover .card-footer {
+  transform: translateY(-70%);
+}
+
+.custom-card:hover .card-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.badge-custom {
+  margin-top: -2.3rem;
+  border-radius: 0;
+  background-color: #00000099;
+}
+
+
+
 /*# sourceMappingURL=custom.css.map */

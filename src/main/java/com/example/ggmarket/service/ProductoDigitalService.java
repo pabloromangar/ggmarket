@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductoDigitalService {
@@ -18,13 +17,11 @@ public class ProductoDigitalService {
     private ProductoDigitalRepository repo;
 
     @Autowired
-    private ImagenJuegoService imagenJuegoService;
-
-
+    private IGDBService imagenJuegoService;
 
     public ProductoDigital crearProducto(ProductoDigital producto) {
         if (producto.getImagenUrl() == null || producto.getImagenUrl().isEmpty()) {
-            String imagen = imagenJuegoService.obtenerImagenPorNombre(producto.getNombre());
+            String imagen = imagenJuegoService.getCoverUrl(producto.getNombre());
             if (imagen != null) {
                 producto.setImagenUrl(imagen);
             }
@@ -40,8 +37,9 @@ public class ProductoDigitalService {
         return repo.findAll();
     }
 
-    public Optional<ProductoDigital> findById(Long id) {
-        return repo.findById(id);
+    public ProductoDigital findById(Long id) {
+        ProductoDigital producto = repo.findById(id).orElse(null);
+        return producto;
     }
 
     public ProductoDigital save(ProductoDigital producto) {
@@ -56,8 +54,8 @@ public class ProductoDigitalService {
         return repo.findByNombreContainingIgnoreCase(nombre);
     }
 
-    public List<ProductoDigital> findByCategoria(String categoria) {
-        return repo.findByCategoriaContainingIgnoreCase(categoria);
+    public List<ProductoDigital> findByTipo(String tipo) {
+        return repo.findByTipoContainingIgnoreCase(tipo);
     }
 
     public List<ProductoDigital> buscarPorNombre(String nombre) {

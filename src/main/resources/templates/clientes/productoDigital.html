@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${producto.nombre}">Producto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/custom.css">
+</head>
+
+<body class="bg-primary text-white">
+
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container my-5">
+        <div class="row g-4 align-items-center">
+            <!-- Imagen -->
+            <div class="col-md-5 text-center">
+                <img th:src="${producto.imagenUrl != null ? producto.imagenUrl : '/img/default.webp'}"
+                     alt="Imagen del producto"
+                     class="img-fluid rounded shadow-sm">
+            </div>
+
+            <!-- Información del producto -->
+            <div class="col-md-7">
+                <h1 class="display-5 mb-3" th:text="${producto.nombre}">Nombre del producto</h1>
+                
+                <h4 class="text-warning mb-4">
+                    <strong th:text="${producto.precio} + ' €'">0.00 €</strong>
+                </h4>
+
+                <ul class="list-group list-group-flush bg-transparent mb-4">
+                    <li class="list-group-item bg-transparent text-white">
+                        <strong>Región:</strong> <span th:text="${producto.region}">Global</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-white">
+                        <strong>Plataforma:</strong> <span th:text="${producto.plataforma}">Steam</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-white">
+                        <strong>Tipo:</strong> <span th:text="${producto.tipo}">Clave</span>
+                    </li>
+                </ul>
+
+                <div class="d-grid gap-2 d-md-flex">
+                    <button class="btn btn-outline-light btn-lg me-md-2">
+                        <i class="bi bi-cart-plus me-2"></i>Añadir al carrito
+                    </button>
+                    <a th:href="@{/productosDigitales}" class="btn btn-light btn-lg">
+                        <i class="bi bi-arrow-left-circle me-2"></i>Volver al catálogo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.6/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+<footer class="footer bg-secondary mt-5 py-4">
+  <div class="container text-white">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h5 class="brand">GGMarket</h5>
+        <p class="text-light">Compara y encuentra las mejores ofertas en juegos digitales.</p>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h6>Enlaces</h6>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link text-light text-decoration-none">Inicio</a></li>
+          <li><a href="#" class="footer-link text-light text-decoration-none">Acerca de</a></li>
+          <li><a href="#" class="footer-link text-light text-decoration-none">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 mb-3">
+        <h6>Redes sociales</h6>
+        <div class="social-icons">
+          <a href="#"><i class="bi bi-twitter text-light"></i></a>
+          <a href="#"><i class="bi bi-instagram text-light"></i></a>
+          <a href="#"><i class="bi bi-github text-light"></i></a>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="text-center small text-ligth">
+      &copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> GGMarket. Todos los derechos reservados.
+    </div>
+  </div>
+</footer>

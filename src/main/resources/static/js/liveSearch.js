@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var buscador = document.getElementById('buscador');
   var resultados = document.getElementById('resultados');
   var overlay = document.getElementById('overlay');
-
+  var defaultImg = '/img/default.webp';
   buscador.addEventListener('input', function() {
     var query = buscador.value.trim();
 
@@ -19,16 +19,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (xhr.status === 200) {
           try {
             var data = JSON.parse(xhr.responseText);
-            console.log(data);
             if (data.length === 0) {
               resultados.innerHTML = '<div>No se encontraron productos</div>';
             } else {
               var html = '';
               for (var i = 0; i < data.length; i++) {
                 var p = data[i];
-                html += '<div data-id="' + p.id + '">' + p.nombre + ' - $' + p.precio + '</div>';
+                html += `<div style='cursor:pointer' data-id='${p.id}'> <img src='${p.imagenUrl!=null?p.imagenUrl:defaultImg}' width='100px'> ${p.nombre} - € ${p.precio} </div>`;
               }
-              resultados.innerHTML = html;
+              resultados.innerHTML = html;  
             }
             resultados.style.display = 'block';
           } catch (e) {
@@ -59,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var target = e.target;
     if (target && target.hasAttribute('data-id')) {
       var id = target.getAttribute('data-id');
-      window.location.href = '/productos/digitales/' + id;
-    }
+      window.location.href = '/productoDigital/' + id;
+    } 
   });
 
   overlay.addEventListener('click', function() {
