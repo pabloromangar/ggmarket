@@ -7,37 +7,78 @@
     <link rel="stylesheet" th:href="@{css/custom.css}">
 </head>
 
-<body>
+<body class="bg-primary">
     <div th:replace="fragments/header :: header"></div>
 
     <div class="container my-5">
-        <h2 class="mb-4">Catálogo de Productos</h2>
+        <h2 class="mb-4 text-white">Productos digitales</h2>
 
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="row row-cols-1 row-cols-md-4 g-4">
             <div class="col" th:each="producto : ${productos.content}">
-                <div class="card h-100">
-                    <img th:src="${producto.imagenUrl}" class="card-img-top" alt="Imagen"
-                        onerror="this.src='img/default.webp'">
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${producto.nombre}"></h5>
-                        <p class="card-text" th:text="${producto.descripcion}"></p>
+                <a th:href="@{/productoDigital/{id}(id=${producto.id})}" class="text-decoration-none text-dark">
+                    <div class="card h-100 position-relative overflow-hidden custom-card bg-info">
+                        <div class="card-header p-0 position-relative">
+                            <!-- Imagen dentro del header -->
+                            <img th:src="${producto.imagenUrl}" class="card-img-top" alt="Imagen"
+                                onerror="this.src='img/default.webp'">
+
+                            <span class="badge position-absolute bottom-0 w-100 text-center"
+                                th:text="${producto.plataforma}"></span>
+                        </div>
+
+                        <div class="card-body position-relative bg-info text-white p-3">
+                            <span class="badge badge-custom start-0 position-absolute text-center w-100"
+                                th:text="${producto.plataforma}"></span>
+                            <h6 class="card-title" th:text="${producto.nombre}">Elden Ring</h6>
+                            <p class="card-text text-warning"><strong th:text="${producto.region}"></strong></p>
+
+                            <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
+                        </div>
+
+                        <div class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info py-1 my-0">
+                            <button class="btn btn-sm btn-success w-100 mb-2 text-white">Añadir al carrito</button>
+                            <button class="btn btn-sm btn-primary w-100 text-white">Explorar</button>
+                        </div>
                     </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
-                        <a th:href="@{/productoDigital/{id}(id=${producto.id})}"
-                            class="btn btn-sm btn-primary">Ver</a>
-                    </div>
-                </div>
+
+                </a>
             </div>
         </div>
 
-        <!-- PAGINACIÓN -->
-        <div>
-            <span th:text="'Página ' + ${productos.number + 1} + ' de ' + ${productos.totalPages}"></span>
-            <a th:if="${!productos.first}" th:href="@{/productosDigitales(page=${productos.number - 1})}">Anterior</a>
-            <a th:if="${!productos.last}" th:href="@{/productosDigitales(page=${productos.number + 1})}">Siguiente</a>
-        </div>
+
+
     </div>
+    
+        <!-- PAGINACIÓN -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+
+                <!-- Botón anterior -->
+                <li class="page-item" th:classappend="${productos.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/productosDigitales(page=${productos.number - 1})}"
+                        aria-label="Anterior">
+                        <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+                    </a>
+                </li>
+
+                <!-- Páginas numeradas (hasta 5) -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, productos.totalPages - 1)}"
+        th:if="${i >= productos.number - 2 and i <= productos.number + 2}"
+        th:classappend="${i == productos.number} ? 'active'">
+      <a class="page-link" th:text="${i + 1}"
+         th:href="@{/productosDigitales(page=${i})}"></a>
+    </li>
+
+    <!-- Botón siguiente -->
+    <li class="page-item" th:classappend="${productos.last} ? 'disabled'">
+      <a class="page-link" th:href="@{/productosDigitales(page=${productos.number + 1})}" aria-label="Siguiente">
+        <span aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+    <div th:replace="fragments/footer :: footer"></div>
 
     <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/liveSearch.js}"></script>

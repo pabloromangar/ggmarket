@@ -23,10 +23,11 @@ public class ProductoDigital {
     private Long id;
 
     private String nombre;
-    private String descripcion;
+    private String region;
+    private String plataforma;
     private Double precio;
     private Integer stock;
-    private String categoria;
+    private String tipo;
     @Column(name = "imagen_url")
     private String imagenUrl;
     @OneToMany(mappedBy = "productoDigital")

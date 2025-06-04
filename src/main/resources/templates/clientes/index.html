@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Productos</title>
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+
+<body class="bg-primary">
+    <div th:replace="fragments/header :: header"></div>
+    <nav class="nav flex-nowrap justify-content-around py-2 bg-primary overflow-x-auto my-3">
+        <a href="#" class="nav-link text-center text-white">
+            <i class="bi bi-controller fs-4"></i><br>
+            <small>Juegos</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 150px;">
+            <i class="bi bi-card-heading fs-4"></i><br>
+            <small>Tarjetas de juego</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-credit-card-2-front fs-4"></i><br>
+            <small>Recarga</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-windows fs-4"></i><br>
+            <small>Windows</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-steam fs-4"></i><br>
+            <small>Steam</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-playstation fs-4"></i><br>
+            <small>PSN</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-xbox fs-4"></i><br>
+            <small>Xbox</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-google-play fs-4"></i><br>
+            <small>Google Play</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-apple fs-4"></i><br>
+            <small>Apple</small>
+        </a>
+        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
+            <i class="bi bi-spotify fs-4"></i><br>
+            <small>Spotify</small>
+        </a>
+    </nav>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/liveSearch.js}"></script>
+</body>
+
+</html>

@@ -17,13 +17,11 @@ public class ProductoDigitalService {
     private ProductoDigitalRepository repo;
 
     @Autowired
-    private ImagenJuegoService imagenJuegoService;
-
-
+    private IGDBService imagenJuegoService;
 
     public ProductoDigital crearProducto(ProductoDigital producto) {
         if (producto.getImagenUrl() == null || producto.getImagenUrl().isEmpty()) {
-            String imagen = imagenJuegoService.obtenerImagenPorNombre(producto.getNombre());
+            String imagen = imagenJuegoService.getCoverUrl(producto.getNombre());
             if (imagen != null) {
                 producto.setImagenUrl(imagen);
             }
@@ -56,8 +54,8 @@ public class ProductoDigitalService {
         return repo.findByNombreContainingIgnoreCase(nombre);
     }
 
-    public List<ProductoDigital> findByCategoria(String categoria) {
-        return repo.findByCategoriaContainingIgnoreCase(categoria);
+    public List<ProductoDigital> findByTipo(String tipo) {
+        return repo.findByTipoContainingIgnoreCase(tipo);
     }
 
     public List<ProductoDigital> buscarPorNombre(String nombre) {

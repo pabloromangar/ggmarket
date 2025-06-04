@@ -4,12 +4,7 @@ import com.example.ggmarket.model.ClaveDigital;
 import com.example.ggmarket.model.ProductoDigital;
 import com.example.ggmarket.service.ClaveDigitalService;
 import com.example.ggmarket.service.ProductoDigitalService;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.ggmarket.service.UsuarioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,9 +12,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
-@RequestMapping("/productos/digitales")
-public class ProductoDigitalController {
+@RequestMapping("/admin")
+public class AdminController {
+
+    @Autowired
+    private UsuarioService usuarioService;
+
     @Autowired
     private ProductoDigitalService productoDigitalService;
 
@@ -27,39 +32,48 @@ public class ProductoDigitalController {
     private ClaveDigitalService claveDigitalService;
 
     @GetMapping
-    public String listar(Model model) {
+    public String panelAdmin(Model model) {
+        return "admin/panel";
+    }
+
+    @GetMapping("/usuarios")
+    public String listarUsuarios(Model model) {
+        model.addAttribute("usuarios", usuarioService.findAll());
+        return "admin/usuarios";
+    }
+
+    @GetMapping("/productos")
+    public String listarProductos(Model model) {
         model.addAttribute("productos", productoDigitalService.findAll());
         return "productos/digitales/lista";
     }
 
-   
-
-    @GetMapping("/nuevo")
+    @GetMapping("/productos/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("producto", new ProductoDigital());
         return "productos/digitales/formulario";
     }
 
-    @PostMapping("/guardar")
+    @PostMapping("/productos/guardar")
     public String guardar(@ModelAttribute ProductoDigital producto) {
         productoDigitalService.crearProducto(producto);
-        return "redirect:/productos/digitales";
+        return "redirect:/admin/productos";
     }
 
-    @GetMapping("/editar/{id}")
+    @GetMapping("/productos/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
         var producto = productoDigitalService.findById(id);
         model.addAttribute("producto", producto);
         return "productos/digitales/formulario";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @GetMapping("/productos/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
         productoDigitalService.deleteById(id);
-        return "redirect:/productos/digitales";
+        return "redirect:/admin/productos";
     }
 
-    @PostMapping("/{id}/claves")
+    @PostMapping("/productos/{id}/claves")
     public String subirClaves(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         ProductoDigital producto = productoDigitalService.findById(id);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -70,7 +84,7 @@ public class ProductoDigitalController {
                 if (primera) {
                     primera = false;
                     continue;
-                } // saltar encabezado
+                }
                 ClaveDigital clave = new ClaveDigital();
                 clave.setClave(linea.trim());
                 clave.setProductoDigital(producto);
@@ -78,24 +92,22 @@ public class ProductoDigitalController {
             }
             claveDigitalService.guardarTodas(claves);
         } catch (IOException e) {
-            e.printStackTrace(); // log real en prod
+            e.printStackTrace(); // Log adecuado en producción
         }
 
-        return "redirect:/productos/digitales";
+        return "redirect:/admin/productos";
     }
 
-    @PostMapping("{id}/importar-claves")
-    public String importarClaves(@PathVariable Long id,
-            @RequestParam("archivo") MultipartFile archivo) {
+    @PostMapping("/productos/{id}/importar-claves")
+    public String importarClaves(@PathVariable Long id, @RequestParam("archivo") MultipartFile archivo) {
         claveDigitalService.importarDesdeCSV(id, archivo);
-        return "redirect:/productos/digitales";
+        return "redirect:/admin/productos";
     }
 
-    @GetMapping("/{id}/importar-claves")
+    @GetMapping("/productos/{id}/importar-claves")
     public String mostrarFormularioImportacion(@PathVariable Long id, Model model) {
         ProductoDigital producto = productoDigitalService.findById(id);
         model.addAttribute("producto", producto);
-        return "productos/digitales/importar_claves";
+        return "productos/digitales/importar-claves";
     }
-
 }

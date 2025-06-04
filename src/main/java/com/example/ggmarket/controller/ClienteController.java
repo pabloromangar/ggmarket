@@ -20,7 +20,7 @@ public class ClienteController {
 
     @GetMapping("/")
     public String index() {
-        return "redirect:/productosDigitales"; // Redirige a la página de inicio
+        return "clientes/index"; // Redirige a la página de inicio
     }
     @GetMapping("/productosDigitales")
     public String listarProductos(Model model,
