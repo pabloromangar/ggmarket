@@ -3,8 +3,6 @@ package com.example.ggmarket.repository;
 import com.example.ggmarket.model.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
-
 public interface RolRepository extends JpaRepository<Rol, Long> {
-    Optional<Rol> findByNombre(String nombre);
+    Rol findByNombre(String nombre);
 }

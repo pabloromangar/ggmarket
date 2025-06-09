@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Catálogo de Productos</title>
-    <link rel="stylesheet" th:href="@{css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 
 <body class="bg-primary">
@@ -15,7 +15,7 @@
 
         <div class="row row-cols-1 row-cols-md-4 g-4">
             <div class="col" th:each="producto : ${productos.content}">
-                <a th:href="@{/productoDigital/{id}(id=${producto.id})}" class="text-decoration-none text-dark">
+                <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="text-decoration-none text-dark">
                     <div class="card h-100 position-relative overflow-hidden custom-card bg-info">
                         <div class="card-header p-0 position-relative">
                             <!-- Imagen dentro del header -->
@@ -55,7 +55,7 @@
 
                 <!-- Botón anterior -->
                 <li class="page-item" th:classappend="${productos.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/productosDigitales(page=${productos.number - 1})}"
+                    <a class="page-link" th:href="@{/tienda/productosDigitales(page=${productos.number - 1})}"
                         aria-label="Anterior">
                         <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
                     </a>
@@ -66,12 +66,12 @@
         th:if="${i >= productos.number - 2 and i <= productos.number + 2}"
         th:classappend="${i == productos.number} ? 'active'">
       <a class="page-link" th:text="${i + 1}"
-         th:href="@{/productosDigitales(page=${i})}"></a>
+         th:href="@{/tienda/productosDigitales(page=${i})}"></a>
     </li>
 
     <!-- Botón siguiente -->
     <li class="page-item" th:classappend="${productos.last} ? 'disabled'">
-      <a class="page-link" th:href="@{/productosDigitales(page=${productos.number + 1})}" aria-label="Siguiente">
+      <a class="page-link" th:href="@{/tienda/productosDigitales(page=${productos.number + 1})}" aria-label="Siguiente">
         <span aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
       </a>
     </li>
