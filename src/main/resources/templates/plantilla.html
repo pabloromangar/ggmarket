@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- La etiqueta <head> de esta página está casi vacía.
+     Solo contiene el 'div' que será REEMPLAZADO por el fragmento. -->
+
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle='Catálogo de Productos')}"></div>
+</head>
+
+<!-- El body también tiene la estructura principal, y los fragmentos lo rellenan.
+     He añadido las clases que tenías en tu vista anterior para mantener la consistencia. -->
+
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
+
+    <main class="container my-5 flex-grow-1">
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+
+</html>

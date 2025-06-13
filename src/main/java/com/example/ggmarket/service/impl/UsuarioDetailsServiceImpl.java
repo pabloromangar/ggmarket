@@ -19,31 +19,35 @@ public class UsuarioDetailsServiceImpl implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    // --- INICIO DE DEPURACIÓN ---
-    System.out.println("======================================================");
-    System.out.println("Auth Check: Intentando cargar usuario por email: " + email);
-    // --- FIN DE DEPURACIÓN ---
-
-    Usuario usuario = usuarioRepository.findByEmail(email)
-        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
-
-    if (usuario == null) {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // --- INICIO DE DEPURACIÓN ---
-        System.out.println("Auth Check: FALLO - Usuario con email '" + email + "' no encontrado en la BBDD.");
+        System.out.println("======================================================");
+        System.out.println("Auth Check: Intentando cargar usuario por email: " + email);
+        // --- FIN DE DEPURACIÓN ---
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+
+        if (usuario == null) {
+            // --- INICIO DE DEPURACIÓN ---
+            System.out.println("Auth Check: FALLO - Usuario con email '" + email + "' no encontrado en la BBDD.");
+            System.out.println("======================================================");
+            // --- FIN DE DEPURACIÓN ---
+            throw new UsernameNotFoundException("Usuario o contraseña inválidos.");
+        }
+
+        // --- INICIO DE DEPURACIÓN ---
+        System.out.println("Auth Check: ÉXITO - Usuario encontrado: " + usuario.getEmail());
+        System.out.println("Auth Check: Rol del usuario: " + usuario.getRol().getNombre());
+        System.out.println("Auth Check: Password HASH de la BBDD: " + usuario.getPassword());
         System.out.println("======================================================");
         // --- FIN DE DEPURACIÓN ---
-        throw new UsernameNotFoundException("Usuario o contraseña inválidos.");
+
+        String authorityName = "ROLE_" + usuario.getRol().getNombre().toUpperCase();
+
+        System.out.println("Auth Check: Creando permiso/autoridad: " + authorityName); // Log de depuración
+
+        GrantedAuthority authority = new SimpleGrantedAuthority(authorityName);
+        return new User(usuario.getEmail(), usuario.getPassword(), Collections.singletonList(authority));
     }
-
-    // --- INICIO DE DEPURACIÓN ---
-    System.out.println("Auth Check: ÉXITO - Usuario encontrado: " + usuario.getEmail());
-    System.out.println("Auth Check: Rol del usuario: " + usuario.getRol().getNombre());
-    System.out.println("Auth Check: Password HASH de la BBDD: " + usuario.getPassword());
-    System.out.println("======================================================");
-    // --- FIN DE DEPURACIÓN ---
-
-    GrantedAuthority authority = new SimpleGrantedAuthority(usuario.getRol().getNombre());
-    return new User(usuario.getEmail(), usuario.getPassword(), Collections.singletonList(authority));
-}
 }

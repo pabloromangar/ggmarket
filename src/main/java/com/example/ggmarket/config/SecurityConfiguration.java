@@ -35,7 +35,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
             // --- RUTAS DE ADMINISTRADOR ---
             // Solo usuarios con rol 'ADMIN' pueden acceder
-            .requestMatchers("/admin/**").hasAuthority("ADMIN")
+            .requestMatchers("/admin/**").hasRole("ADMIN")
 
             // --- CUALQUIER OTRA RUTA ---
             // Todas las demás URLs requieren que el usuario esté autenticado

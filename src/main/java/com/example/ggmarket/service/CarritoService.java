@@ -9,6 +9,7 @@ import com.example.ggmarket.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -159,5 +160,19 @@ public class CarritoService {
         item.setCantidad(nuevaCantidad);
         carritoRepository.save(item);
         System.out.println("CARRITO: Actualizada cantidad a " + nuevaCantidad + " para producto ID " + productoId);
+    }
+
+    @Transactional
+    public void limpiarCarrito(String emailUsuario) {
+        Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Obtiene todos los items del carrito para ese usuario
+        List<Carrito> items = carritoRepository.findByUsuario(usuario);
+
+        // Los elimina todos
+        if (!items.isEmpty()) {
+            carritoRepository.deleteAll(items);
+        }
     }
 }

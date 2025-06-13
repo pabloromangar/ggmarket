@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle='Mis Pedidos')}"></div>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <h1 class="mb-4">Mis Pedidos</h1>
+
+        <div th:if="${#lists.isEmpty(pedidos)}" class="text-center p-5 bg-secondary-subtle rounded text-dark">
+            <h3 class="mb-3">Aún no tienes pedidos</h3>
+            <p class="lead">Todos los pedidos que realices aparecerán aquí.</p>
+            <a th:href="@{/}" class="btn btn-primary mt-3">Explorar la tienda</a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(pedidos)}" class="accordion" id="accordionPedidos">
+            <div th:each="pedido, iterStat : ${pedidos}" class="accordion-item bg-dark border-secondary">
+                <h2 class="accordion-header" th:id="'heading' + ${iterStat.count}">
+                    <button class="accordion-button bg-secondary-subtle text-dark collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#collapse' + ${iterStat.count}">
+                        <div class="d-flex w-100 justify-content-between align-items-center pe-3 flex-wrap">
+                            <span class="fw-bold me-3">Pedido [[${pedido.id}]]</span>
+                            <span class="me-3" th:text="${#temporals.format(pedido.fechaCreacion, 'dd-MM-yyyy')}">Fecha</span>
+                            <span class="badge me-3" th:classappend="${pedido.estado == 'COMPLETADO'} ? 'bg-success' : 'bg-warning'" th:text="${pedido.estado}">Estado</span>
+                            <span class="fw-bold" th:text="'Total: €' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">Total</span>
+                        </div>
+                    </button>
+                </h2>
+                <div th:id="'collapse' + ${iterStat.count}" class="accordion-collapse collapse" data-bs-parent="#accordionPedidos">
+                    <div class="accordion-body text-white">
+                        <h6 class="border-bottom border-secondary pb-2 mb-3">Detalles del Pedido</h6>
+                              
+<!-- Reemplaza el bucle completo de detalles en mis-pedidos.html -->
+
+<div th:each="detalle : ${pedido.detalles}" class="d-flex flex-column flex-md-row align-items-md-center mb-3 border-bottom border-secondary pb-3">
+    
+    <!-- ============ LÓGICA DE IMAGEN CORREGIDA Y SEGURA ============ -->
+    <div class="me-md-3 align-self-center mb-2 mb-md-0">
+        <!-- 
+          CASO 1: Si el producto es nulo O su URL de imagen está vacía, mostramos la imagen por defecto.
+          El 'or' aquí es clave, porque si la primera parte (productoDigital == null) es cierta,
+          la segunda parte nunca se evalúa, evitando un NullPointerException.
+        -->
+        <img th:if="${detalle.productoDigital == null or #strings.isEmpty(detalle.productoDigital.imagenUrl)}" 
+             th:src="@{/img/default.webp}" 
+             alt="Imagen por defecto" 
+             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+
+        <!-- 
+          CASO 2: Si el producto SÍ existe Y su URL de imagen NO está vacía, la mostramos.
+        -->
+        <img th:unless="${detalle.productoDigital == null or #strings.isEmpty(detalle.productoDigital.imagenUrl)}" 
+             th:src="${detalle.productoDigital.imagenUrl}" 
+             th:alt="${detalle.productoDigital.nombre}" 
+             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+    </div>
+    <!-- ============================================================== -->
+
+    <div class="flex-grow-1 my-2 my-md-0 text-center text-md-start">
+        <p class="mb-0 fw-bold" th:text="${detalle.productoDigital?.nombre}">Nombre no disponible</p>
+        <small class="text-muted" th:text="'Precio: €' + ${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}"></small>
+    </div>
+
+    <div class="ms-md-auto text-center text-md-end mt-2 mt-md-0">
+        <p class="mb-1 small text-muted-white">Tu Clave de Activación:</p>
+        
+        <!-- También hacemos la clave a prueba de nulos, por si acaso -->
+        <th:block th:if="${detalle.claveDigital != null}">
+            <code class="fs-5 p-2 bg-light text-dark rounded user-select-all" th:text="${detalle.claveDigital.clave}">ABCD-EFGH-IJKL-MNOP</code>
+        </th:block>
+        <th:block th:if="${detalle.claveDigital == null}">
+            <span class="text-danger">Clave no asignada</span>
+        </th:block>
+    </div>
+</div>
+
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <!-- ASEGÚRATE DE QUE ESTA LÍNEA ESTÉ AQUÍ -->
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

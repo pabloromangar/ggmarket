@@ -5,69 +5,74 @@
   Este es un fragmento de Thymeleaf, por lo que no necesita <html> o <body>.
   La declaración xmlns:sec es importante para que los atributos sec:authorize funcionen.
 -->
+
+<head th:fragment="head(pageTitle)">
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle} + ' | GGMarket'"></title>
+
+  <!-- CSS de Bootstrap y personalizado -->
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/custom.css}">
+
+  <!-- META TAGS DE SEGURIDAD CSRF (ESENCIALES PARA AJAX) -->
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+
 <div th:fragment="header">
+  <div class="bg-primary text-white shadow-sm">
+    <div class="bg-primary container text-white py-4 px-4 d-flex align-items-center justify-content-between">
+      <!-- Logo y Nombre del Sitio -->
+      <a class="d-flex py-0 my-0 align-items-center text-white text-decoration-none" th:href="@{/}">
+        <img th:src="@{/img/logo.png}" alt="GG" style="width: 200px; margin-right: 10px; filter: drop-shadow(2px 2px 0px rgba(0, 49, 51, 0.462));">
+      </a>
 
-  <!-- ================================================================= -->
-  <!-- ESTILOS Y SCRIPTS NECESARIOS PARA EL HEADER                       -->
-  <!-- ================================================================= -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  
-  <!-- ================================================================= -->
-  <!-- BARRA SUPERIOR (LOGO, BUSCADOR, CARRITO, LOGIN/PERFIL)            -->
-  <!-- ================================================================= -->
-  <div class="bg-primary container text-white shadow-sm py-4 px-4 d-flex align-items-center justify-content-between">
-    
-    <!-- Logo y Nombre del Sitio -->
-    <a class="d-flex align-items-center text-white text-decoration-none" th:href="@{/}">
-      <img th:src="@{/images/logo.png}" alt="GG" style="height: 30px; margin-right: 10px;">
-      <span class="fw-bold fs-4">GG Market</span>
-    </a>
-
-    <!-- Barra de Búsqueda -->
-    <form class="flex-grow-1 mx-4 position-relative" style="max-width: 600px;">
+      <!-- Barra de Búsqueda -->
+      <form class="flex-grow-1 mx-4 position-relative" style="max-width: 600px;">
         <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
-      <input type="text" id="buscador" class="form-control form-control-lg px-5"
-        placeholder="Buscar juegos, recargas, códigos..." aria-label="Buscar"
-        autocomplete="on">
-      <div id="resultados" class="position-absolute bg-white text-dark border border-primary rounded shadow mt-2"
-        style="display: none; width: 100%; max-height: 200px; overflow-y: auto; z-index: 100;">
-      </div>
-    </form>
+        <input type="text" id="buscador" class="form-control form-control-lg px-5"
+          placeholder="Buscar juegos, recargas, códigos..." aria-label="Buscar" autocomplete="on">
+        <div id="resultados" class="position-absolute bg-white text-dark border border-primary rounded shadow mt-2"
+          style="display: none; width: 100%; max-height: 200px; overflow-y: auto; z-index: 100;">
+        </div>
+      </form>
 
-    <!-- Acciones del Usuario (Carrito y Autenticación) -->
-    <div class="d-flex gap-3 align-items-center">
-      
-      <!-- Carrito de Compras Dinámico -->
-      <!-- En fragments/header.html, reemplaza el <a> del carrito por este <button> -->
+      <!-- Acciones del Usuario (Carrito y Autenticación) -->
+      <div class="d-flex gap-3 align-items-center">
 
-<!-- Carrito de Compras (Ahora es un botón que abre el offcanvas) -->
-<button type="button" class="btn btn-outline-light position-relative" 
-        data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" 
-        aria-controls="cartOffcanvas" aria-label="Carrito" id="header-cart-button">
-    <i class="bi bi-cart3 fs-4"></i>
-    <span th:if="${itemsEnCarrito > 0}" id="cart-item-count" 
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-flex justify-content-center align-items-center">
-        <span th:text="${itemsEnCarrito}"></span>
-        <span class="visually-hidden">items en carrito</span>
-    </span>
-</button>
-      
-      <!-- Bloque para USUARIOS NO AUTENTICADOS -->
-      <div sec:authorize="!isAuthenticated()" class="d-flex gap-3">
-        <a th:href="@{/login}" class="btn btn-outline-light"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión</a>
-        <a th:href="@{/registro}" class="btn btn-primary">Registrarse</a>
-      </div>
-      
-      <!-- Bloque para USUARIOS AUTENTICADOS (Menú Desplegable) -->
-      <div sec:authorize="isAuthenticated()" class="dropdown">
-        <a href="#" class="btn btn-outline-light dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-person-circle me-2"></i>
-          <!-- Mostramos el email del usuario -->
-          <span class="d-none d-lg-inline" th:text="${#authentication.name}"></span>
+        <!-- Carrito de Compras Dinámico -->
+        <!-- En fragments/header.html, reemplaza el <a> del carrito por este <button> -->
+
+        <!-- Carrito de Compras (Ahora es un botón que abre el offcanvas) -->
+        <button type="button" class="btn btn-outline-light position-relative" data-bs-toggle="offcanvas"
+          data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="Carrito" id="header-cart-button">
+          <i class="bi bi-cart3 fs-4"></i>
+          <span th:if="${itemsEnCarrito > 0}" id="cart-item-count"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-flex justify-content-center align-items-center">
+            <span th:text="${itemsEnCarrito}"></span>
+            <span class="visually-hidden">items en carrito</span>
+          </span>
+        </button>
+
+        <!-- Bloque para USUARIOS NO AUTENTICADOS -->
+        <div sec:authorize="!isAuthenticated()" class="d-flex gap-3">
+          <a th:href="@{/login}" class="btn btn-outline-light"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar
+            sesión</a>
+          <a th:href="@{/registro}" class="btn btn-primary">Registrarse</a>
+        </div>
+
+        <!-- Bloque para USUARIOS AUTENTICADOS (Menú Desplegable) -->
+        <div sec:authorize="isAuthenticated()" class="dropdown">
+          <a href="#" class="btn btn-outline-light dropdown-toggle d-flex align-items-center" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-2"></i>
+            <!-- Mostramos el email del usuario -->
+            <span class="d-none d-lg-inline" th:text="${#authentication.name}"></span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
-          <li><a class="dropdown-item" href="#">Mis Pedidos</a></li>
+          <li><a class="dropdown-item" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
           <li><hr class="dropdown-divider"></li>
           <li>
             <!-- Formulario de Logout para mayor seguridad con CSRF -->
@@ -79,7 +84,7 @@
           </li>
         </ul>
       </div>
-
+    </div>
     </div>
   </div>
 

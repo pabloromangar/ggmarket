@@ -89,7 +89,9 @@ public class CarritoApiController {
             @AuthenticationPrincipal UserDetails userDetails) {
         log.info("API: Petición recibida en /eliminar con DTO: {}", dto);
         if (userDetails == null) {
-            /* ... */ }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "Debes iniciar sesión para realizar esta acción."));
+        }
 
         try {
             // Validamos que el ID venga en el DTO
@@ -111,7 +113,9 @@ public class CarritoApiController {
             @AuthenticationPrincipal UserDetails userDetails) {
         log.info("API: Petición recibida en /actualizar-cantidad con DTO: {}", dto);
         if (userDetails == null) {
-            /* ... */ }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "Debes iniciar sesión para realizar esta acción."));
+        }
 
         try {
             // Validamos que ambos campos vengan en el DTO

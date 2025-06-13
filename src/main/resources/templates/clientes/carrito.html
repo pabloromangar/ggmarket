@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- La etiqueta <head> de esta página está casi vacía.
+     Solo contiene el 'div' que será REEMPLAZADO por el fragmento. -->
+
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle='Catálogo de Productos')}"></div>
+</head>
+
+<!-- El body también tiene la estructura principal, y los fragmentos lo rellenan.
+     He añadido las clases que tenías en tu vista anterior para mantener la consistencia. -->
+
+<body class="d-flex flex-column min-vh-100 bg-primary text-white">
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
+
+     <!-- En src/main/resources/templates/carrito.html -->
+<main class="container my-5 flex-grow-1">
+    <h1 class="mb-4">Tu Carrito de Compras</h1>
+
+    <!-- 
+        ESTA ES LA ESTRUCTURA PRINCIPAL Y CORRECTA.
+        La clase 'row' es el contenedor de flexbox de Bootstrap para las columnas.
+        La clase 'g-5' añade un espaciado (gutter) entre las columnas.
+    -->
+    <div class="row g-5">
+
+        <!-- ===== COLUMNA IZQUIERDA: LISTA DE PRODUCTOS ===== -->
+        <!-- 
+            col-12: En el tamaño más pequeño (móvil), ocupa el 100% del ancho.
+            col-lg-8: A partir del breakpoint 'lg' (desktop), ocupa 8 de 12 columnas.
+        -->
+        <div class="col-12 col-lg-8">
+            <div class="card bg-dark text-white border-secondary">
+                <div class="card-header bg-secondary-subtle text-dark">
+                    <h5 class="mb-0">Productos en tu carrito</h5>
+                </div>
+                <div class="card-body">
+                    <div id="cart-items-scroll-container">
+                        <div id="cart-page-items-container"></div>
+                        <div id="cart-page-placeholder" class="text-center p-5">
+                            Cargando productos...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== COLUMNA DERECHA: RESUMEN DEL PEDIDO ===== -->
+        <!-- 
+            col-12: También ocupa el 100% en móvil (se apilará debajo de la otra).
+            col-lg-4: A partir de 'lg', ocupa las 4 columnas restantes.
+        -->
+        <div class="col-12 col-lg-4">
+            <div class="card bg-secondary-subtle text-dark sticky-top" style="top: 100px;">
+                <div class="card-body">
+                    <!-- ... Tu código del resumen del pedido (subtotal, total, botón) ... -->
+                    <h4 class="card-title mb-4">Resumen del Pedido</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                            Subtotal
+                            <span id="cart-page-subtotal">€0.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0">
+                            Envío
+                            <span>Gratis</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 border-top pt-3">
+                            <strong class="h5">Total</strong>
+                            <strong class="h5" id="cart-page-total">€0.00</strong>
+                        </li>
+                    </ul>
+                    <div class="d-grid mt-4">
+                        <a href="/checkout" id="btn-proceed-to-checkout" class="btn btn-primary btn-lg disabled">
+                            Proceder al Pago
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. OBTENER ELEMENTOS DEL DOM
+    const itemsContainer = document.getElementById('cart-page-items-container');
+    const placeholder = document.getElementById('cart-page-placeholder');
+    const subtotalEl = document.getElementById('cart-page-subtotal');
+    const totalEl = document.getElementById('cart-page-total');
+    const checkoutBtn = document.getElementById('btn-proceed-to-checkout');
+    const cartCounter = document.getElementById('cart-item-count'); // Para actualizar el icono del navbar
+
+    // Código defensivo: si no estamos en la página del carrito, no hacemos nada.
+    if (!itemsContainer) {
+        return;
+    }
+
+    // 2. FUNCIÓN PARA CARGAR Y RENDERIZAR EL CARRITO
+    const loadCartContent = async () => {
+        showLoadingState(true, 'Cargando productos...');
+        
+        try {
+            // Reutilizamos el mismo endpoint que usa el offcanvas
+            const response = await fetch('/api/carrito/contenido');
+            if (!response.ok) throw new Error('Error del servidor');
+            
+            const data = await response.json();
+            
+            itemsContainer.innerHTML = ''; // Limpiamos el contenedor
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => {
+                    itemsContainer.insertAdjacentHTML('beforeend', createCartItemHTML(item));
+                });
+                showLoadingState(false);
+                checkoutBtn.classList.remove('disabled');
+            } else {
+                showLoadingState(true, 'Tu carrito está vacío.');
+                checkoutBtn.classList.add('disabled');
+            }
+            updateCartSummary(data.total || 0);
+            updateCartIconCounter(data.items.length);
+
+        } catch (error) {
+            showLoadingState(true, 'Error al cargar el carrito.');
+            console.error('Error en loadCartContent:', error);
+        }
+    };
+
+    // 3. FUNCIÓN PARA GESTIONAR ACTUALIZACIONES (copiada de tu lógica)
+    const handleUpdateCart = async (url, payload) => {
+        try {
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeaderName = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', [csrfHeaderName]: csrfToken },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+            const data = await response.json();
+            if (data.success) {
+                // Si la operación tuvo éxito, recargamos el contenido del carrito
+                await loadCartContent();
+            } else {
+                alert(data.message || 'La operación falló.');
+            }
+        } catch (error) {
+            console.error(`Error en handleUpdateCart (${url}):`, error);
+        }
+    };
+
+    // 4. FUNCIONES AUXILIARES DE UI
+    const createCartItemHTML = (item) => {
+    const subtotal = (item.precio * item.cantidad).toFixed(2);
+    
+    return `
+        <div class="cart-item bg-secondary-subtle text-dark p-3 rounded mb-3" data-product-id="${item.productoId}">
+            <div class="row align-items-center">
+
+                <!-- Columna 1: Imagen (ocupa 2 de 12 columnas en desktop) -->
+                <div class="col-12 col-md-2 text-center mb-3 mb-md-0">
+                    <img src="${item.imagenUrl || '/img/default.webp'}" alt="${item.nombre}" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                </div>
+
+                <div class="col-12 col-md-4 text-center text-md-start">
+                    <h6 class="fw-bold mb-1">${item.nombre}</h6>
+                    <p class="small text-muted mb-0">Vendedor: ${item.vendedor}</p>
+                </div>
+
+                <div class="col-12 col-md-6 mt-3 mt-md-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Controles de Cantidad -->
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-dark btn-sm btn-quantity-change" data-change="-1">-</button>
+                            <span class="mx-3 fw-bold quantity-display">${item.cantidad}</span>
+                            <button class="btn btn-dark btn-sm btn-quantity-change" data-change="1">+</button>
+                        </div>
+                        <!-- Subtotal -->
+                        <span class="fw-bold mx-3" style="min-width: 70px; text-align: right;">€${subtotal}</span>
+                        <!-- Botón Eliminar -->
+                        <button class="btn btn-danger btn-sm delete-cart-item-btn"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+};
+
+    const updateCartSummary = (total) => {
+        const totalFormatted = `€${total.toFixed(2)}`;
+        subtotalEl.textContent = totalFormatted;
+        totalEl.textContent = totalFormatted;
+    };
+    
+    const updateCartIconCounter = (itemCount) => {
+        if (cartCounter) {
+            const spanNumero = cartCounter.querySelector('span:first-child');
+            if (itemCount > 0) {
+                if(spanNumero) spanNumero.textContent = itemCount;
+                cartCounter.style.display = 'flex';
+            } else {
+                cartCounter.style.display = 'none';
+            }
+        }
+    };
+
+    const showLoadingState = (show, message = '') => {
+        placeholder.style.display = show ? 'block' : 'none';
+        placeholder.textContent = message;
+    };
+
+    // 5. EVENT LISTENER (DELEGACIÓN DE EVENTOS)
+    itemsContainer.addEventListener('click', (event) => {
+        const itemElement = event.target.closest('.cart-item');
+        if (!itemElement) return;
+
+        const productId = itemElement.dataset.productId;
+        const payload = { productId: productId };
+
+        if (event.target.closest('.delete-cart-item-btn')) {
+            handleUpdateCart('/api/carrito/eliminar', payload);
+        } else if (event.target.closest('.btn-quantity-change')) {
+            const quantityDisplay = itemElement.querySelector('.quantity-display');
+            const change = parseInt(event.target.closest('.btn-quantity-change').dataset.change);
+            const newQuantity = parseInt(quantityDisplay.textContent) + change;
+            
+            payload.nuevaCantidad = newQuantity;
+            // La API ya maneja si newQuantity es 0, así que podemos simplificar
+            handleUpdateCart('/api/carrito/actualizar-cantidad', payload);
+        }
+    });
+
+    // 6. INICIALIZACIÓN
+    loadCartContent();
+});
+    </script>
+</body>
+
+</html>

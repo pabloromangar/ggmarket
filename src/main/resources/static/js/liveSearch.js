@@ -1,68 +1,79 @@
 document.addEventListener('DOMContentLoaded', function() {
-  var buscador = document.getElementById('buscador');
-  var resultados = document.getElementById('resultados');
-  var overlay = document.getElementById('overlay');
-  var defaultImg = '/img/default.webp';
-  buscador.addEventListener('input', function() {
-    var query = buscador.value.trim();
+    
+    // 1. Buscamos el elemento MÁS IMPORTANTE.
+    const buscador = document.getElementById('buscador');
 
-    if (query.length < 3) {
-      resultados.style.display = 'none';
-      resultados.innerHTML = '';
-      return;
+    // 2. ========= LA SOLUCIÓN CLAVE =========
+    // Si el elemento 'buscador' NO existe en la página actual,
+    // detenemos la ejecución de este script para evitar errores.
+    if (!buscador) {
+        return; // Salimos de la función y no hacemos nada más.
     }
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/productos/digitales/buscar?nombre=' + encodeURIComponent(query), true);
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          try {
-            var data = JSON.parse(xhr.responseText);
-            if (data.length === 0) {
-              resultados.innerHTML = '<div>No se encontraron productos</div>';
-            } else {
-              var html = '';
-              for (var i = 0; i < data.length; i++) {
-                var p = data[i];
-                html += `<div style='cursor:pointer' data-id='${p.id}'> <img src='${p.imagenUrl!=null?p.imagenUrl:defaultImg}' width='100px'> ${p.nombre} - € ${p.precio} </div>`;
-              }
-              resultados.innerHTML = html;  
-            }
-            resultados.style.display = 'block';
-          } catch (e) {
-            resultados.innerHTML = '<div>Error al parsear resultados</div>';
-            resultados.style.display = 'block';
-          }
-        } else {
-          resultados.innerHTML = '<div>Error al cargar resultados</div>';
-          resultados.style.display = 'block';
+    // 3. Si llegamos aquí, significa que el buscador SÍ existe.
+    // Ahora podemos buscar el resto de elementos y añadir los listeners de forma segura.
+    const resultados = document.getElementById('resultados');
+    const overlay = document.getElementById('overlay');
+    const defaultImg = '/img/default.webp';
+
+    buscador.addEventListener('input', function() {
+        const query = buscador.value.trim();
+
+        if (query.length < 3) {
+            resultados.style.display = 'none';
+            resultados.innerHTML = '';
+            return;
         }
-      }
-    };
-    xhr.send();
-  });
 
-  buscador.addEventListener('focus', function() {
-    overlay.style.display = 'block';
-  });
+        // Usamos fetch, que es un poco más moderno que XMLHttpRequest
+        fetch('/api/productos/digitales/buscar?nombre=' + encodeURIComponent(query))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.length === 0) {
+                    resultados.innerHTML = '<div class="p-3">No se encontraron productos</div>';
+                } else {
+                    // Usamos map y join para construir el HTML, es más limpio
+                    const html = data.map(p => `
+                        <a href="/tienda/productoDigital/${p.id}" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <img src="${p.imagenUrl || defaultImg}" alt="${p.nombre}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 15px;">
+                            <div>
+                                <div class="fw-bold">${p.nombre}</div>
+                                <div>€ ${p.precio.toFixed(2)}</div>
+                            </div>
+                        </a>
+                    `).join('');
+                    resultados.innerHTML = `<div class="list-group list-group-flush">${html}</div>`;
+                }
+                resultados.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error en la búsqueda:', error);
+                resultados.innerHTML = '<div class="p-3 text-danger">Error al cargar resultados</div>';
+                resultados.style.display = 'block';
+            });
+    });
 
-  buscador.addEventListener('blur', function() {
-    setTimeout(function() {
-      overlay.style.display = 'none';
-      resultados.style.display = 'none';
-    }, 200);
-  });
+    buscador.addEventListener('focus', function() {
+        overlay.style.display = 'block';
+    });
 
-  resultados.addEventListener('click', function(e) {
-    var target = e.target;
-    if (target && target.hasAttribute('data-id')) {
-      var id = target.getAttribute('data-id');
-      window.location.href = '/productoDigital/' + id;
-    } 
-  });
+    buscador.addEventListener('blur', function() {
+        // Usamos un pequeño retardo para permitir que se haga clic en los resultados
+        setTimeout(function() {
+            overlay.style.display = 'none';
+            resultados.style.display = 'none';
+        }, 200);
+    });
 
-  overlay.addEventListener('click', function() {
-    buscador.blur();
-  });
+    // Nota: El listener de 'click' en 'resultados' no es necesario
+    // porque ahora los resultados son etiquetas <a> que ya tienen el enlace.
+
+    overlay.addEventListener('click', function() {
+        buscador.blur(); // Esto oculta el overlay y los resultados
+    });
 });

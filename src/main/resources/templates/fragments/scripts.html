@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+    <!-- ======================================================= -->
+    <!-- FRAGMENTO DE SCRIPTS COMUNES                          -->
+    <!-- ======================================================= -->
+    <th:block th:fragment="scripts">
+
+        <!-- Bootstrap Bundle (incluye Popper.js) -->
+        <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+        
+        <!-- Scripts personalizados de la aplicación -->
+        <script th:src="@{/js/liveSearch.js}"></script>
+        <script th:src="@{/js/cart.js}"></script>
+
+        <!-- 
+            Bloque especial para pasar el estado de autenticación de Spring Security
+            a una variable global de JavaScript. Esencial para que scripts como cart.js
+            sepan si deben pedir login o no.
+        -->
+        <script>
+            let userIsAuthenticated = false;
+        </script>
+        <div sec:authorize="isAuthenticated()">
+            <script>
+                userIsAuthenticated = true;
+            </script>
+        </div>
+
+    </th:block>
+
+</body>
+
+</html>

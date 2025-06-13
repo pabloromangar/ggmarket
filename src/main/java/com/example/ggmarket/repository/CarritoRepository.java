@@ -18,4 +18,6 @@ public interface CarritoRepository extends JpaRepository<Carrito, Long> {
     int countByUsuario_Email(String email);
 
     List<Carrito> findByUsuario_Email(String email);
+
+    List<Carrito> findByUsuario(Usuario usuario);
 }

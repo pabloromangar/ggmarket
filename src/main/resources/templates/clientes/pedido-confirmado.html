@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle='Pedido Confirmado')}"></div>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container text-center my-auto">
+        <div class="py-5">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            <h1 class="display-5 fw-bold mt-3">¡Gracias por tu compra!</h1>
+            <div class="col-lg-6 mx-auto">
+                <p class="lead mb-4" th:if="${successMessage}" th:text="${successMessage}">
+                    Tu pedido ha sido procesado y recibirás una confirmación en breve.
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a th:href="@{/}" type="button" class="btn btn-primary btn-lg px-4 gap-3">Volver a la tienda</a>
+                    <a th:href="@{/mis-pedidos}" type="button" class="btn btn-outline-secondary btn-lg px-4">Ver mis pedidos</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

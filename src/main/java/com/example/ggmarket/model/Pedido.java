@@ -2,8 +2,14 @@ package com.example.ggmarket.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "pedidos")
 public class Pedido {
@@ -12,18 +18,28 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
-    private ProductoFisico productoFisico;
+    @Column(nullable = false)
+    private LocalDateTime fechaCreacion;
 
-    private String tipoProducto;  // "digital" o "fisico"
-    private String estado;  // "pendiente", "pagado", "enviado"
+    @Column(nullable = false)
+    private String estado; // "PROCESANDO", "COMPLETADO", "CANCELADO"
 
-    private String fecha;
+    @Column(nullable = false)
+    private BigDecimal total;
 
-    // Getters and setters
+    // Relación One-to-Many: Un pedido tiene muchos detalles (líneas de producto).
+    // cascade = CascadeType.ALL: Si guardamos/eliminamos un Pedido, se guardan/eliminan sus detalles.
+    // orphanRemoval = true: Si quitamos un detalle de la lista, se elimina de la BD.
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetallePedido> detalles = new ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = LocalDateTime.now();
+        this.estado = "PROCESANDO";
+    }
 }

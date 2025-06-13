@@ -46,7 +46,7 @@ public class AuthController {
             Model model) {
 
         // 1. Comprobar si el email ya existe
-        if (usuarioRepository.findByEmail(registroDTO.getEmail()) != null) {
+        if (usuarioRepository.existsByEmail(registroDTO.getEmail())) {
             // Añadimos un error específico al campo 'email'
             result.rejectValue("email", "error.usuario", "Este correo electrónico ya está registrado");
         }

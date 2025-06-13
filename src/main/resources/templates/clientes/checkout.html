@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-primary text-white">
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <h1 class="mb-4">Finalizar Compra</h1>
+
+        <div class="row g-5 text-white">
+            <!-- Columna izquierda: Formulario de datos -->
+            <div class="col-12 col-lg-7">
+                <div class="card bg-dark text-white border-secondary p-4">
+                    <h4>Datos de Facturación (Simulado)</h4>
+                    <hr class="border-secondary">
+
+                    <form th:action="@{/checkout/procesar}" method="post">
+                        <!-- Token CSRF, muy importante para la seguridad -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="apellidos" class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" id="apellidos" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" placeholder="tu@email.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" placeholder="Calle Falsa 123"
+                                required>
+                        </div>
+                        <hr class="my-4 border-secondary">
+                        <h4 class="mb-3">Pago (Simulado)</h4>
+                        <p class="text-white">No se te cobrará nada. Esto es solo una simulación.</p>
+
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg text-white" type="submit">Finalizar Compra y
+                                Pagar</button>
+                        </div>
+                        <!-- En checkout.html, debajo de <h1>Finalizar Compra</h1> -->
+
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Columna derecha: Resumen del pedido -->
+            <div class="col-12 col-lg-5">
+                <div class="card bg-dark text-white border-secondary sticky-top" style="top: 100px;">
+                    <div class="card-header bg-secondary-subtle text-dark">
+                        <h4 class="d-flex justify-content-between align-items-center mb-0">
+                            <span>Tu Pedido</span>
+                            <span class="badge bg-primary rounded-pill" th:text="${#lists.size(cartItems)}">0</span>
+                        </h4>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li th:each="item : ${cartItems}" class="list-group-item d-flex justify-content-between lh-sm bg-dark text-white">
+                            <div>
+                                <h6 class="my-0" th:text="${item.nombre}">Nombre Producto</h6>
+                                <small class="text-muted" th:text="'Cantidad: ' + ${item.cantidad}">Cantidad</small>
+                            </div>
+                            <span class="text-muted" th:text="'€' + ${#numbers.formatDecimal(item.precio * item.cantidad, 1, 2)}">€0.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between bg-dark text-white">
+                            <strong class="h5">Total (EUR)</strong>
+                            <strong class="h5" th:text="'€' + ${#numbers.formatDecimal(cartTotal, 1, 2)}">€0.00</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>
