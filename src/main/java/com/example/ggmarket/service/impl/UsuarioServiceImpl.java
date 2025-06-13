@@ -1,23 +1,29 @@
 package com.example.ggmarket.service.impl;
 
+import com.example.ggmarket.dto.UsuarioRegistroDTO;
+import com.example.ggmarket.model.Rol;
 import com.example.ggmarket.model.Usuario;
+import com.example.ggmarket.repository.RolRepository;
 import com.example.ggmarket.repository.UsuarioRepository;
 import com.example.ggmarket.service.UsuarioService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
+public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<Usuario> findAll() {
@@ -39,23 +45,29 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         usuarioRepository.deleteById(id);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(username) // si usas email para login
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-        return new org.springframework.security.core.userdetails.User(
-                usuario.getEmail(),
-                usuario.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getRol().getNombre())));
-    }
-
     public Usuario saveUsuario(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 
     public Object findByEmail(String email) {
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+        return usuarioRepository.findByEmail(email);
     }
+
+    @Override
+    public Usuario guardar(UsuarioRegistroDTO registroDTO) {
+        // 1. Busca el rol por defecto. Si no existe, lo crea.
+        Rol rolCliente = rolRepository.findByNombre("CLIENTE");
+        // 2. Crea la nueva entidad Usuario
+        // Nota: Asegúrate de que tu entidad Usuario tenga un constructor que coincida.
+        Usuario usuario = new Usuario(
+                registroDTO.getNombre(),
+                registroDTO.getEmail(),
+                // 3. Encripta la contraseña
+                passwordEncoder.encode(registroDTO.getPassword()),
+                rolCliente);
+
+        // 4. Guarda el usuario en la base de datos
+        return usuarioRepository.save(usuario);
+    }
+
 }

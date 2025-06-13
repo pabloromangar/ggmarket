@@ -1,12 +1,14 @@
 package com.example.ggmarket.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-
 import java.util.List;
 
-@Data
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
+@Data
+@NoArgsConstructor 
 @Table(name = "usuarios")
 public class Usuario {
 
@@ -19,11 +21,24 @@ public class Usuario {
     private String email;
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "rol_id", nullable = false)
+   @ManyToOne(fetch = FetchType.EAGER) 
+    @JoinColumn(name = "rol_id", referencedColumnName = "id")
     private Rol rol;
+public Usuario(String nombre, String email, String password, Rol rol) {
+        this.nombre = nombre;
+        this.email = email;
+        this.password = password;
+        this.rol = rol;
+    }
 
-    private String fechaRegistro;
+    // Getters y Setters para 'rol'
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
 
     @OneToMany(mappedBy = "usuario")
     private List<Pedido> pedidos;

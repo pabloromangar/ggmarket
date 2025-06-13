@@ -10,8 +10,4 @@ public class GgmarketApplication {
 		SpringApplication.run(GgmarketApplication.class, args);
 	}
 
-	@Test
-	void contextLoads() {
-	}
-
 }

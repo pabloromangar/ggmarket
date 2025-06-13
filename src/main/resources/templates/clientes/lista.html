@@ -5,11 +5,18 @@
     <meta charset="UTF-8">
     <title>Catálogo de Productos</title>
     <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
+
+
 
 <body class="bg-primary">
     <div th:replace="fragments/header :: header"></div>
 
+    <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
+
+</body>
     <div class="container my-5">
         <h2 class="mb-4 text-white">Productos digitales</h2>
 
@@ -35,10 +42,21 @@
                             <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
                         </div>
 
-                        <div class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info py-1 my-0">
-                            <button class="btn btn-sm btn-success w-100 mb-2 text-white">Añadir al carrito</button>
+                        <div
+                            class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info py-1 my-0">
+                            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-sm btn-success w-100 mb-2 text-white">
+                                Añadir al Carrito
+                            </a>
+
+                            <!-- Si el usuario SÍ está logueado, muestra el botón que activa el JavaScript -->
+                            <button sec:authorize="isAuthenticated()" class="btn btn-sm btn-success w-100 mb-2 text-white btn-add-to-cart"
+                                th:data-product-id="${producto.id}">
+                                Añadir al Carrito
+                            </button>
                             <button class="btn btn-sm btn-primary w-100 text-white">Explorar</button>
+
                         </div>
+
                     </div>
 
                 </a>
@@ -48,21 +66,21 @@
 
 
     </div>
-    
-        <!-- PAGINACIÓN -->
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
 
-                <!-- Botón anterior -->
-                <li class="page-item" th:classappend="${productos.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/tienda/productosDigitales(page=${productos.number - 1})}"
-                        aria-label="Anterior">
-                        <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
-                    </a>
-                </li>
+    <!-- PAGINACIÓN -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
 
-                <!-- Páginas numeradas (hasta 5) -->
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, productos.totalPages - 1)}"
+            <!-- Botón anterior -->
+            <li class="page-item" th:classappend="${productos.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/tienda/productosDigitales(page=${productos.number - 1})}"
+                    aria-label="Anterior">
+                    <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+                </a>
+            </li>
+
+            <!-- Páginas numeradas (hasta 5) -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, productos.totalPages - 1)}"
         th:if="${i >= productos.number - 2 and i <= productos.number + 2}"
         th:classappend="${i == productos.number} ? 'active'">
       <a class="page-link" th:text="${i + 1}"
@@ -80,8 +98,17 @@
 
     <div th:replace="fragments/footer :: footer"></div>
 
-    <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+ <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/liveSearch.js}"></script>
-</body>
+    <script>
+    let userIsAuthenticated = false;
+</script>
 
+<div sec:authorize="isAuthenticated()">
+    <script>
+        userIsAuthenticated = true;
+    </script>
+</div>
+    <script th:src="@{/js/cart.js}"></script>
+</body>
 </html>

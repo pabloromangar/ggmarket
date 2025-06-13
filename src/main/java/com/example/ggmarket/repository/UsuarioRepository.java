@@ -1,12 +1,15 @@
 package com.example.ggmarket.repository;
 
 import com.example.ggmarket.model.Usuario;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByEmail(String email);
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-    Optional<Usuario> findByNombre(String nombre);
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    public Optional<Usuario> findByEmail(String email);
+
 }
