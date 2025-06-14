@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Usamos nuestro fragmento de head estándar -->
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+    <!-- Usamos el navbar estándar -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card bg-dark text-white border-secondary">
+                    <div class="card-header bg-secondary-subtle text-dark">
+                        <!-- El título cambia dinámicamente: "Añadir..." o "Editar..." -->
+                        <h3 th:text="${pageTitle}">Formulario de Producto</h3>
+                    </div>
+                    <div class="card-body">
+                        <!--
+                          Este formulario envía los datos al endpoint /guardar.
+                          th:object conecta el formulario con el objeto 'productoFisico' del modelo.
+                        -->
+                        <form th:action="@{/panel-vendedor/productos/guardar}" th:object="${productoFisico}" method="post">
+                            
+                            <!-- Token de seguridad CSRF (esencial para POST) -->
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            
+                            <!--
+                              CAMPO OCULTO PARA EL ID.
+                              - Si es un producto nuevo, th:field="*{id}" será vacío.
+                              - Si es una edición, contendrá el ID del producto,
+                                permitiendo al controlador saber que es una actualización.
+                            -->
+                            <input type="hidden" th:field="*{id}" />
+
+                            <!-- Campo: Nombre -->
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Producto</label>
+                                <input type="text" th:field="*{nombre}" class="form-control" id="nombre" required>
+                            </div>
+
+                            <!-- Campo: Descripción -->
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea th:field="*{descripcion}" class="form-control" id="descripcion" rows="4"></textarea>
+                            </div>
+
+                            <!-- Campo: URL de la Imagen -->
+                            <div class="mb-3">
+                                <label for="imagenUrl" class="form-label">URL de la Imagen</label>
+                                <input type="url" th:field="*{imagenUrl}" class="form-control" id="imagenUrl" placeholder="https://ejemplo.com/imagen.jpg">
+                                <div class="form-text text-light mt-1">
+                                    Pega una URL de una imagen. Si se deja en blanco, se usará una por defecto.
+                                </div>
+                            </div>
+                            
+                            <!-- Campo: Precio -->
+                            <div class="mb-3">
+                                <label for="precio" class="form-label">Precio (€)</label>
+                                <input type="number" th:field="*{precio}" class="form-control" id="precio" step="0.01" required>
+                            </div>
+
+                            <!-- Botón de Envío -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary text-white">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer y Scripts estándar -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

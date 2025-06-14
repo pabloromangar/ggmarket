@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <!-- Usamos el fragmento head para consistencia -->
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-primary text-white">
+
+    <!-- Navbar y Offcanvas estándar -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
+
+    <!-- Contenido principal de la página -->
+    <main class="container my-5 flex-grow-1">
+        <h2 class="mb-4">Marketplace de Productos Físicos</h2>
+
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <!-- Iteramos sobre la lista de productos físicos paginada -->
+            <div class="col" th:each="producto : ${productosFisicos.content}">
+                
+                <!-- El enlace ahora podría ir a una página de detalle de producto físico -->
+                <a th:href="@{/tienda/productoFisico/{id}(id=${producto.id})}" class="text-decoration-none text-dark">
+                    
+                    <div class="card h-100 position-relative overflow-hidden custom-card bg-info">
+                        <div class="card-header p-0 position-relative">
+                            
+                            <!-- Lógica de imagen reutilizada, está perfecta -->
+                            <img th:if="${#strings.isEmpty(producto.imagenUrl)}"
+                                 th:src="@{/img/default.webp}"
+                                 class="card-img-top" alt="Imagen por defecto">
+                            <img th:unless="${#strings.isEmpty(producto.imagenUrl)}"
+                                 th:src="${producto.imagenUrl}"
+                                 class="card-img-top" alt="Imagen del producto">
+                            
+                        </div>
+
+                        <div class="card-body position-relative bg-info text-white p-3">
+                            <!-- CAMBIO: Mostramos el nombre del vendedor -->
+                            <p class="card-text small mb-1" th:text="'Vendido por: ' + ${producto.vendedor.nombre}"></p>
+                            <h6 class="card-title" th:text="${producto.nombre}">Nombre del Producto</h6>
+                            <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
+                        </div>
+                        
+                        <!-- 
+                          ========= CAMBIO MÁS IMPORTANTE: LAS ACCIONES =========
+                          Quitamos la lógica del carrito. Ahora hay un solo botón "Comprar Ahora"
+                          que inicia el flujo de compra directa.
+                        -->
+                        <div class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info p-2">
+                            <a th:href="@{/comprar/fisico/{id}(id=${producto.id})}" class="btn btn-sm btn-success w-100 text-white">
+                                Comprar Ahora
+                            </a>
+                        </div>
+                        <!-- ======================================================= -->
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 
+          PAGINACIÓN
+          Funciona igual, solo cambiamos la URL a la del marketplace.
+        -->
+        <nav aria-label="Page navigation" th:if="${productosFisicos.totalPages > 1}" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <!-- Botón anterior -->
+                <li class="page-item" th:classappend="${productosFisicos.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/marketplace(page=${productosFisicos.number - 1})}" aria-label="Anterior">
+                        <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+                    </a>
+                </li>
+                <!-- Páginas numeradas -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, productosFisicos.totalPages - 1)}"
+                    th:if="${i >= productosFisicos.number - 2 and i <= productosFisicos.number + 2}"
+                    th:classappend="${i == productosFisicos.number} ? 'active'">
+                  <a class="page-link" th:text="${i + 1}" th:href="@{/marketplace(page=${i})}"></a>
+                </li>
+                <!-- Botón siguiente -->
+                <li class="page-item" th:classappend="${productosFisicos.last} ? 'disabled'">
+                  <a class="page-link" th:href="@{/marketplace(page=${productosFisicos.number + 1})}" aria-label="Siguiente">
+                    <span aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+                  </a>
+                </li>
+              </ul>
+        </nav>
+    </main>
+
+    <!-- Footer y Scripts estándar -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>

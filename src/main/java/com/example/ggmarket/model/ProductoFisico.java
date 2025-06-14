@@ -15,6 +15,7 @@ public class ProductoFisico {
     private String nombre;
     private String descripcion;
     private Double precio;
+    private String imagenUrl;
 
     @ManyToOne
     @JoinColumn(name = "vendedor_id")

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+  <!-- 
+    FRAGMENTO DE TARJETA DE PRODUCTO
+    Recibe un objeto 'producto' y renderiza una tarjeta completa.
+  -->
+  <div th:fragment="producto-card(producto)">
+    <div class="col h-100">
+      <!-- Enlace a la página de detalle del producto -->
+      <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="text-decoration-none text-dark">
+        <div class="card h-100 position-relative overflow-hidden custom-card bg-info">
+          
+          <div class="card-header p-0 position-relative">
+            <!-- Imagen con lógica de fallback -->
+            <img th:if="${#strings.isEmpty(producto.imagenUrl)}" th:src="@{/img/default.webp}" class="card-img-top" alt="Imagen por defecto">
+            <img th:unless="${#strings.isEmpty(producto.imagenUrl)}" th:src="${producto.imagenUrl}" class="card-img-top" th:alt="${producto.nombre}">
+            <span class="badge position-absolute bottom-0 w-100 text-center" th:text="${producto.plataforma}"></span>
+          </div>
+          
+          <div class="card-body position-relative bg-info text-white p-3">
+            <h6 class="card-title" th:text="${producto.nombre}">Nombre del Producto</h6>
+            <p class="card-text text-warning"><strong th:text="${producto.region}"></strong></p>
+            <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
+          </div>
+          
+          <div class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info py-1 my-0">
+            <!-- Lógica de botones de añadir al carrito -->
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-sm btn-success w-100 mb-2 text-white">Añadir al Carrito</a>
+            <button sec:authorize="isAuthenticated()" class="btn btn-sm btn-success w-100 mb-2 text-white btn-add-to-cart" th:data-product-id="${producto.id}">Añadir al Carrito</button>
+            <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="btn btn-sm btn-primary w-100 text-white">Explorar</a>
+          </div>
+
+        </div>
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <!-- Usamos nuestro fragmento de head estándar -->
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+
+    <!-- Navbar estándar -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <h1 class="mb-4">Mi Perfil</h1>
+
+                <!-- Tarjeta con la información del usuario -->
+                <div class="card bg-dark text-white border-secondary mb-4">
+                    <div class="card-header bg-secondary-subtle text-dark">
+                        <h5 class="mb-0">Mis Datos</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Nombre:</strong> <span th:text="${usuario.nombre}"></span></p>
+                        <p><strong>Email:</strong> <span th:text="${usuario.email}"></span></p>
+                        <p><strong>Rol Actual:</strong> 
+                            <span class="badge bg-primary fs-6" th:text="${usuario.rol.nombre}"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta con acciones y enlaces -->
+                <div class="card bg-dark text-white border-secondary">
+                    <div class="card-header bg-secondary-subtle text-dark">
+                        <h5 class="mb-0">Acciones</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <!-- Enlace al historial de pedidos (para todos los usuarios logueados) -->
+                        <a th:href="@{/mis-pedidos}" class="list-group-item list-group-item-action bg-dark text-white">
+                            <i class="bi bi-receipt-cutoff me-2"></i>Ver mi historial de pedidos
+                        </a>
+
+                        <!-- Enlace al panel de vendedor (SOLO para Vendedores y Admins) -->
+                        <a th:href="@{/panel-vendedor}" class="list-group-item list-group-item-action bg-dark text-white"
+                           th:if="${#authorization.expression('hasRole(''VENDEDOR'') or hasRole(''ADMIN'')')}">
+                            <i class="bi bi-shop me-2"></i>Ir a mi Panel de Vendedor
+                        </a>
+                        
+                        <!-- Enlace al panel de admin (SOLO para Admins) -->
+                         <a th:href="@{/admin/productos-digitales}" class="list-group-item list-group-item-action bg-dark text-white"
+                           th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                            <i class="bi bi-shield-lock-fill me-2"></i>Panel de Administración
+                        </a>
+                    </div>
+                </div>
+
+                <!--
+                  SECCIÓN PARA CONVERTIRSE EN VENDEDOR
+                  Solo visible si el rol del usuario es exactamente 'CLIENTE'.
+                -->
+                <div class="card bg-dark text-white border-secondary mt-5"
+                     th:if="${#authorization.expression('hasRole(''CLIENTE'')')}">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">¿Quieres vender tus propios productos?</h4>
+                        <p class="card-text">
+                            Conviértete en vendedor y empieza a listar tus productos físicos en nuestra plataforma.
+                        </p>
+                        <form th:action="@{/perfil/convertirse-vendedor}" method="post" class="mt-3">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-success btn-lg">Quiero ser Vendedor</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Botón de Cerrar Sesión -->
+                <div class="text-center mt-5">
+                    <form th:action="@{/logout}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-outline-danger">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer y Scripts estándar -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

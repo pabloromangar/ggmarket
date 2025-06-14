@@ -20,13 +20,25 @@ public class DetallePedido {
     private Pedido pedido;
 
     @ManyToOne
-    @JoinColumn(name = "producto_digital_id", nullable = false)
+    @JoinColumn(name = "producto_digital_id", nullable = true)
     private ProductoDigital productoDigital; // Qué producto se compró
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_fisico_id", nullable = true)
+    private ProductoFisico productoFisico; // <-- NUEVO CAMPO
     private int cantidad;
     private BigDecimal precioUnitario; // A qué precio se compró
-    @OneToOne // Una línea de pedido se corresponde con UNA única clave vendida.
-    @JoinColumn(name = "clave_digital_id", unique = true) // <-- ¡AQUÍ ESTÁ LA MAGIA!
+    @OneToOne
+    @JoinColumn(name = "clave_digital_id", unique = true) // <-- PROBLEMA #2 (sutil)
     private ClaveDigital claveDigital;
-    // ... (constructores, getters, setters)
+
+    public String getNombreProducto() {
+        if (productoDigital != null) {
+            return productoDigital.getNombre();
+        }
+        if (productoFisico != null) {
+            return productoFisico.getNombre();
+        }
+        return "Producto no disponible";
+    }
 }

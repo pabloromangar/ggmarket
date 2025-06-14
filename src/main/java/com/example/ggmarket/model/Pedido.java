@@ -31,15 +31,14 @@ public class Pedido {
     @Column(nullable = false)
     private BigDecimal total;
 
-    // Relación One-to-Many: Un pedido tiene muchos detalles (líneas de producto).
-    // cascade = CascadeType.ALL: Si guardamos/eliminamos un Pedido, se guardan/eliminan sus detalles.
-    // orphanRemoval = true: Si quitamos un detalle de la lista, se elimina de la BD.
+    @Column(nullable = false)
+    private String tipoPedido; // "DIGITAL" o "FISICO"
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePedido> detalles = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
-        this.estado = "PROCESANDO";
     }
+
 }

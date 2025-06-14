@@ -2,6 +2,7 @@ package com.example.ggmarket.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     @Bean
@@ -36,7 +38,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             // --- RUTAS DE ADMINISTRADOR ---
             // Solo usuarios con rol 'ADMIN' pueden acceder
             .requestMatchers("/admin/**").hasRole("ADMIN")
-
+            .requestMatchers("/perfil/**").authenticated()
             // --- CUALQUIER OTRA RUTA ---
             // Todas las demás URLs requieren que el usuario esté autenticado
             .anyRequest().authenticated()

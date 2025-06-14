@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+    <div th:replace="~{fragments/header :: header}"></div>
+    <main class="container my-5">
+        <h1>Confirmar Compra</h1>
+        <div class="card bg-dark text-white border-secondary">
+            <div class="card-body">
+                <h4 th:text="${producto.nombre}"></h4>
+                <p th:text="'Vendido por: ' + ${producto.vendedor.nombre}"></p>
+                <p class="fs-3 fw-bold" th:text="'Precio: €' + ${producto.precio}"></p>
+
+                <!-- 
+                  ========= FORMULARIO CORREGIDO =========
+                -->
+                <form th:action="@{/comprar/fisico/procesar}" method="post" class="mt-4">
+                    
+                    <!-- 
+                      LÍNEA CRÍTICA QUE SOLUCIONA EL ERROR:
+                      Este campo oculto envía el ID del producto junto con la petición.
+                      'name="productoId"' debe coincidir con el @RequestParam del controlador.
+                    -->
+                    <input type="hidden" name="productoId" th:value="${producto.id}" />
+                    <input type="hidden">
+                    <!-- Token de seguridad CSRF, siempre necesario en formularios POST -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">Confirmar y Realizar Pedido</button>
+                </form>
+                <!-- ====================================== -->
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div></head>
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+    <div th:replace="~{fragments/header :: header}"></div>
+    <main class="container my-5">
+        <h1>Mis Ventas</h1>
+        <!-- ... mensajes de éxito/error ... -->
+        <table class="table table-dark table-striped">
+            <thead><tr><th>Pedido ID</th><th>Producto</th><th>Comprador</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody>
+                <tr th:each="venta : ${ventas}">
+                    <td th:text="${venta.id}"></td>
+                    <!-- Asumimos que un pedido físico solo tiene un detalle -->
+                    <td th:text="${venta.detalles[0].getNombreProducto()}"></td>
+                    <td th:text="${venta.usuario.nombre}"></td>
+                    <td><span class="badge" th:classappend="${venta.estado == 'ENVIADO'} ? 'bg-success' : 'bg-warning'" th:text="${venta.estado}"></span></td>
+                    <td>
+                        <form th:if="${venta.estado == 'PENDIENTE_ENVIO'}" th:action="@{/panel-vendedor/ventas/confirmar/{id}(id=${venta.id})}" method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-sm btn-success">Confirmar Envío</button>
+                        </form>
+                        <span th:if="${venta.estado == 'ENVIADO'}" class="text-success">Completado</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

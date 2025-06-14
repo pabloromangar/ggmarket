@@ -15,5 +15,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
      * Spring Data JPA crea la consulta automáticamente a partir del nombre del método.
      */
     List<Pedido> findByUsuarioOrderByFechaCreacionDesc(Usuario usuario);
+
+    List<Pedido> findDistinctByDetalles_ProductoFisico_Vendedor(Usuario vendedor);
     
 }

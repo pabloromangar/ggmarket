@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-        <div th:replace="~{fragments/header :: head(pageTitle='Catálogo de Productos')}"></div>
-    </head>
-
-
-<body class="bg-primary">
+    <!-- El fragmento head es perfecto -->
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-primary text-white">
+    <!-- El fragmento de header responsive está perfecto -->
     <div th:replace="~{fragments/header :: header}"></div>
-
-    <!-- 2. Rellenamos con el Offcanvas del Carrito -->
     <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
-    
+
     <nav class="nav container flex-nowrap justify-content-around py-2 bg-primary overflow-x-auto my-3">
         <a href="#" class="nav-link text-center text-white">
             <i class="bi bi-controller fs-4"></i><br>
@@ -54,10 +51,58 @@
             <small>Spotify</small>
         </a>
     </nav>
+    
+    <!-- ============ INICIO DEL CONTENIDO PRINCIPAL ============ -->
+    <main class="container my-4 flex-grow-1">
 
- <div th:replace="~{fragments/footer :: footer}"></div>
+        <!-- ===== SECCIÓN 1: JUEGOS BARATOS ===== -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Juegos en Oferta</h2>
+                <a href="#" class="btn btn-outline-light">Ver más</a>
+            </div>
+            <!-- El 'th:if' asegura que la fila solo se muestre si hay productos -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:if="${!juegosBaratos.isEmpty()}">
+                <!-- Iteramos sobre la lista 'juegosBaratos' del modelo -->
+                <th:block th:each="producto : ${juegosBaratos}">
+                    <!-- Usamos nuestro nuevo fragmento de tarjeta -->
+                    <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
+                </th:block>
+            </div>
+        </section>
 
+        <!-- ===== SECCIÓN 2: TARJETAS DE SALDO ===== -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Tarjetas de Saldo y Recargas</h2>
+                <a href="#" class="btn btn-outline-light">Ver más</a>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:if="${!tarjetas.isEmpty()}">
+                <!-- Iteramos sobre la lista 'tarjetas' del modelo -->
+                <th:block th:each="producto : ${tarjetas}">
+                    <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
+                </th:block>
+            </div>
+        </section>
+
+        <!-- ===== SECCIÓN 3: CÓDIGOS DE SOFTWARE ===== -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Software y Windows</h2>
+                <a href="#" class="btn btn-outline-light">Ver más</a>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:if="${!software.isEmpty()}">
+                <!-- Iteramos sobre la lista 'software' del modelo -->
+                <th:block th:each="producto : ${software}">
+                    <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
+                </th:block>
+            </div>
+        </section>
+
+    </main>
+    <!-- ============ FIN DEL CONTENIDO PRINCIPAL ============ -->
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
     <div th:replace="~{fragments/scripts :: scripts}"></div>
 </body>
-
 </html>

@@ -3,8 +3,11 @@ package com.example.ggmarket.service;
 import com.example.ggmarket.model.*;
 import com.example.ggmarket.repository.ClaveDigitalRepository;
 import com.example.ggmarket.repository.PedidoRepository;
+import com.example.ggmarket.repository.ProductoFisicoRepository;
 import com.example.ggmarket.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,13 +21,18 @@ public class PedidoService {
     private final CarritoViewService carritoViewService;
     private final CarritoService carritoService;
     private final ClaveDigitalRepository claveDigitalRepository;
+    private final ProductoFisicoRepository productoFisicoRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService,CarritoViewService carritoViewService, UsuarioRepository usuarioRepository, ClaveDigitalRepository claveDigitalRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService,
+            CarritoViewService carritoViewService, UsuarioRepository usuarioRepository,
+            ClaveDigitalRepository claveDigitalRepository, 
+            ProductoFisicoRepository productoFisicoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
         this.carritoViewService = carritoViewService;
         this.claveDigitalRepository = claveDigitalRepository;
         this.carritoService = carritoService;
+        this.productoFisicoRepository = productoFisicoRepository;
     }
 
     public List<Pedido> findPedidosByUsuarioEmail(String emailUsuario) {
@@ -35,15 +43,16 @@ public class PedidoService {
         // Luego usamos el nuevo método del repositorio
         return pedidoRepository.findByUsuarioOrderByFechaCreacionDesc(usuario);
     }
+
     /**
      * Crea un nuevo pedido a partir del carrito de un usuario, lo guarda en la BD
      * y luego limpia el carrito.
      * La anotación @Transactional asegura que toda la operación sea atómica:
      * o todo se completa con éxito, o no se hace ningún cambio en la BD.
      */
-     @Transactional // ¡MUY IMPORTANTE! Si algo falla, deshace todos los cambios.
+    @Transactional // ¡MUY IMPORTANTE! Si algo falla, deshace todos los cambios.
     public Pedido crearPedidoDesdeCarrito(String emailUsuario) {
-        
+
         // 1. OBTENER DATOS INICIALES
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario).get();
         List<Carrito> itemsCarrito = carritoViewService.getItemsDelUsuario(emailUsuario);
@@ -51,7 +60,7 @@ public class PedidoService {
         // 2. CREAR EL "CONTENEDOR" DEL PEDIDO
         Pedido nuevoPedido = new Pedido();
         nuevoPedido.setUsuario(usuario);
-        
+
         BigDecimal totalGeneral = BigDecimal.ZERO;
 
         // 3. PROCESAR CADA PRODUCTO DEL CARRITO
@@ -60,11 +69,11 @@ public class PedidoService {
 
             // 4. POR CADA UNIDAD COMPRADA, BUSCAR Y ASIGNAR UNA CLAVE
             for (int i = 0; i < itemCarrito.getCantidad(); i++) {
-                
+
                 // 4a. Buscar en el inventario una clave disponible para este producto
                 ClaveDigital claveParaVender = claveDigitalRepository
-                    .findTopByProductoDigitalAndUsadaIsFalse(productoComprado)
-                    .orElseThrow(() -> new RuntimeException("Stock agotado para " + productoComprado.getNombre()));
+                        .findTopByProductoDigitalAndUsadaIsFalse(productoComprado)
+                        .orElseThrow(() -> new RuntimeException("Stock agotado para " + productoComprado.getNombre()));
 
                 // 4b. Marcar la clave como usada para que no se vuelva a vender
                 claveParaVender.setUsada(true);
@@ -75,18 +84,18 @@ public class PedidoService {
                 detalle.setProductoDigital(productoComprado);
                 detalle.setCantidad(1); // Cada detalle es para 1 clave
                 detalle.setPrecioUnitario(BigDecimal.valueOf(productoComprado.getPrecio()));
-                
+
                 // 4d. === VINCULAR EL DETALLE CON LA CLAVE (USANDO OBJETOS) ===
                 // JPA se encargará de usar la ID por debajo.
                 detalle.setClaveDigital(claveParaVender);
-                
+
                 // 4e. Añadir esta línea completa al pedido
                 nuevoPedido.getDetalles().add(detalle);
-                
+
                 // 4f. Actualizar el total
                 totalGeneral = totalGeneral.add(detalle.getPrecioUnitario());
             }
-            
+
             // 5. ACTUALIZAR EL STOCK GENERAL DEL PRODUCTO
             productoComprado.setStock(productoComprado.getStock() - itemCarrito.getCantidad());
         }
@@ -94,10 +103,62 @@ public class PedidoService {
         // 6. GUARDAR TODO
         nuevoPedido.setTotal(totalGeneral);
         pedidoRepository.save(nuevoPedido); // Gracias a CascadeType.ALL, esto guarda el pedido y todos sus detalles.
-        
+
         // 7. LIMPIAR EL CARRITO
         carritoService.limpiarCarrito(emailUsuario);
 
         return nuevoPedido;
     }
+
+    @Transactional
+    public Pedido crearPedidoParaProductoFisico(Long productoId, String emailComprador) {
+        Usuario comprador = usuarioRepository.findByEmail(emailComprador)
+                .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
+
+        ProductoFisico producto = productoFisicoRepository.findById(productoId)
+                .orElseThrow(() -> new RuntimeException("Producto físico no encontrado"));
+
+        // Crear el Pedido
+        Pedido pedido = new Pedido();
+        pedido.setUsuario(comprador);
+        pedido.setTotal(BigDecimal.valueOf(producto.getPrecio()));
+        pedido.setTipoPedido("FISICO");
+        pedido.setEstado("PENDIENTE_ENVIO"); // <-- Nuevo estado inicial
+
+        // Crear el Detalle del Pedido
+        DetallePedido detalle = new DetallePedido();
+        detalle.setPedido(pedido);
+        detalle.setProductoFisico(producto); // <-- Asignamos el producto físico
+        detalle.setCantidad(1);
+        detalle.setPrecioUnitario(BigDecimal.valueOf(producto.getPrecio()));
+
+        // Añadimos el detalle al pedido
+        pedido.getDetalles().add(detalle);
+
+        return pedidoRepository.save(pedido);
+    }
+
+    public List<Pedido> findPedidosParaVendedor(String emailVendedor) {
+    Usuario vendedor = usuarioRepository.findByEmail(emailVendedor)
+        .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
+    return pedidoRepository.findDistinctByDetalles_ProductoFisico_Vendedor(vendedor);
+}
+
+// Cambia el estado del pedido a "ENVIADO"
+@Transactional
+public void confirmarEnvio(Long pedidoId, String emailVendedor) {
+    Pedido pedido = pedidoRepository.findById(pedidoId)
+        .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        
+    // Comprobación de seguridad
+    boolean perteneceAlVendedor = pedido.getDetalles().stream()
+        .anyMatch(d -> d.getProductoFisico() != null && d.getProductoFisico().getVendedor().getEmail().equals(emailVendedor));
+
+    if (!perteneceAlVendedor) {
+        throw new AccessDeniedException("No tienes permiso para modificar este pedido.");
+    }
+    
+    pedido.setEstado("ENVIADO");
+    pedidoRepository.save(pedido);
+}
 }

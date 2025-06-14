@@ -1,151 +1,126 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<!-- 
-  Este es un fragmento de Thymeleaf, por lo que no necesita <html> o <body>.
-  La declaración xmlns:sec es importante para que los atributos sec:authorize funcionen.
+<body>
+
+<!--
+  ====================================================================================
+  Fragmento de Head - Sin cambios.
+  ====================================================================================
 -->
-
 <head th:fragment="head(pageTitle)">
-  <meta charset="UTF-8">
-  <title th:text="${pageTitle} + ' | GGMarket'"></title>
-
-  <!-- CSS de Bootstrap y personalizado -->
-  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" th:href="@{/css/custom.css}">
-
-  <!-- META TAGS DE SEGURIDAD CSRF (ESENCIALES PARA AJAX) -->
-  <meta name="_csrf" th:content="${_csrf.token}" />
-  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' | GGMarket'"></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
+
+<!--
+  ====================================================================================
+  Fragmento de Header Principal - ESTRUCTURA DE DOS NIVELES
+  ====================================================================================
+-->
 <div th:fragment="header">
-  <div class="bg-primary text-white shadow-sm">
-    <div class="bg-primary container text-white py-4 px-4 d-flex align-items-center justify-content-between">
-      <!-- Logo y Nombre del Sitio -->
-      <a class="d-flex py-0 my-0 align-items-center text-white text-decoration-none" th:href="@{/}">
-        <img th:src="@{/img/logo.png}" alt="GG" style="width: 200px; margin-right: 10px; filter: drop-shadow(2px 2px 0px rgba(0, 49, 51, 0.462));">
-      </a>
 
-      <!-- Barra de Búsqueda -->
-      <form class="flex-grow-1 mx-4 position-relative" style="max-width: 600px;">
-        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
-        <input type="text" id="buscador" class="form-control form-control-lg px-5"
-          placeholder="Buscar juegos, recargas, códigos..." aria-label="Buscar" autocomplete="on">
-        <div id="resultados" class="position-absolute bg-white text-dark border border-primary rounded shadow mt-2"
-          style="display: none; width: 100%; max-height: 200px; overflow-y: auto; z-index: 100;">
+    <!-- 
+      NIVEL 1: Header Principal (bg-primary)
+      Este navbar contiene el logo, la búsqueda y las acciones. Se colapsa en móvil.
+    -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container px-4">
+
+            <!-- Logo (siempre visible) -->
+            <a class="navbar-brand py-0 my-0" th:href="@{/}">
+                <img th:src="@{/img/logo.png}" alt="GG" style="width: 150px;">
+            </a>
+
+            <!-- Acciones en Móvil (Carrito y Hamburguesa) -->
+            <div class="d-flex align-items-center d-lg-none">
+                <button type="button" class="btn btn-outline-light position-relative me-2" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span th:if="${itemsEnCarrito > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span th:text="${itemsEnCarrito}"></span>
+                    </span>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent" aria-controls="mainNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <!-- Contenido Colapsable (lo que va dentro de la hamburguesa en móvil) -->
+            <div class="collapse navbar-collapse" id="mainNavbarContent">
+
+                <!-- Barra de Búsqueda (centrada en desktop) -->
+                <form class="flex-grow-1 mx-lg-5 my-3 my-lg-0 position-relative" style="max-width: 600px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
+                    <input type="text" id="buscador" class="form-control px-5" placeholder="Buscar en GGMarket...">
+                    <div id="resultados" class="position-absolute bg-white text-dark border rounded shadow mt-2" style="display: none; width: 100%; z-index: 100;"></div>
+                </form>
+
+                <!-- Acciones de Usuario (alineadas al final) -->
+                <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
+                    <!-- Carrito (solo visible en desktop) -->
+                    <button type="button" class="btn btn-outline-light position-relative d-none d-lg-block" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                        <i class="bi bi-cart3 fs-4"></i>
+                        <span th:if="${itemsEnCarrito > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span th:text="${itemsEnCarrito}"></span>
+                        </span>
+                    </button>
+                    <!-- Lógica de Autenticación -->
+                    <div sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/login}" class="btn btn-outline-light">Iniciar sesión</a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()" class="dropdown">
+                        <a href="#" class="btn btn-outline-light dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span class="d-none d-lg-inline" th:text="${#authentication.name}"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="@{/perfil}">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post"><button type="submit" class="dropdown-item">Cerrar Sesión</button></form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                 <!-- 
+                   ENLACES DE CATEGORÍAS (PARA MÓVIL)
+                   Estos enlaces aparecen dentro de la hamburguesa.
+                   Usamos d-lg-none para que se oculten en desktop.
+                 -->
+                <ul class="navbar-nav d-lg-none mt-3">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/marketplace}">Marketplace</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Juegos Baratos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Códigos de Windows</a></li>
+                </ul>
+            </div>
         </div>
-      </form>
+    </nav>
 
-      <!-- Acciones del Usuario (Carrito y Autenticación) -->
-      <div class="d-flex gap-3 align-items-center">
-
-        <!-- Carrito de Compras Dinámico -->
-        <!-- En fragments/header.html, reemplaza el <a> del carrito por este <button> -->
-
-        <!-- Carrito de Compras (Ahora es un botón que abre el offcanvas) -->
-        <button type="button" class="btn btn-outline-light position-relative" data-bs-toggle="offcanvas"
-          data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="Carrito" id="header-cart-button">
-          <i class="bi bi-cart3 fs-4"></i>
-          <span th:if="${itemsEnCarrito > 0}" id="cart-item-count"
-            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-flex justify-content-center align-items-center">
-            <span th:text="${itemsEnCarrito}"></span>
-            <span class="visually-hidden">items en carrito</span>
-          </span>
-        </button>
-
-        <!-- Bloque para USUARIOS NO AUTENTICADOS -->
-        <div sec:authorize="!isAuthenticated()" class="d-flex gap-3">
-          <a th:href="@{/login}" class="btn btn-outline-light"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar
-            sesión</a>
-          <a th:href="@{/registro}" class="btn btn-primary">Registrarse</a>
+    <!-- 
+      NIVEL 2: Barra de Categorías (bg-secondary)
+      - Usamos 'd-none d-lg-flex' para que esta barra se oculte COMPLETAMENTE en móvil
+        y solo aparezca como un contenedor flex en escritorio.
+    -->
+    <div class="bg-secondary shadow-sm d-none d-lg-flex">
+        <div class="container px-4 py-2">
+            <div class="d-flex justify-content-between gap-5">
+                <a class="text-white text-decoration-none fw-semibold" th:href="@{/marketplace}"><i class="bi bi-shop me-1"></i> Marketplace</a>
+                <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-controller me-1"></i> Juegos Baratos</a>
+                <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-laptop me-1"></i> Códigos de Windows</a>
+                <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-credit-card-2-front me-1"></i> Tarjetas de Saldo</a>
+            </div>
         </div>
-
-        <!-- Bloque para USUARIOS AUTENTICADOS (Menú Desplegable) -->
-        <div sec:authorize="isAuthenticated()" class="dropdown">
-          <a href="#" class="btn btn-outline-light dropdown-toggle d-flex align-items-center" role="button"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle me-2"></i>
-            <!-- Mostramos el email del usuario -->
-            <span class="d-none d-lg-inline" th:text="${#authentication.name}"></span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
-          <li><a class="dropdown-item" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li>
-            <!-- Formulario de Logout para mayor seguridad con CSRF -->
-            <form th:action="@{/logout}" method="post" class="d-inline">
-              <button type="submit" class="dropdown-item">
-                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-              </button>
-            </form>
-          </li>
-        </ul>
-      </div>
     </div>
-    </div>
-  </div>
-
-  <!-- ================================================================= -->
-  <!-- BARRA INFERIOR (NAVEGACIÓN DE CATEGORÍAS)                         -->
-  <!-- ================================================================= -->
-  <nav class="navbar navbar-expand bg-secondary rounded-0 shadow-sm py-3">
-    <div class="d-flex  container container-fluid px-4 d-flex align-items-center">
-      <div class="d-flex w-100 justify-content-between">
-        <a class="d-block text-white text-decoration-none fw-semibold" data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasCategorias" aria-controls="offcanvasCategorias">
-          <i class="bi bi-list me-1"></i> Categorías
-        </a>
-        <a href="#" class="d-block text-white text-decoration-none fw-semibold">
-          <i class="bi bi-controller me-1"></i> Juegos Baratos
-        </a>
-        <a href="#" class="d-block text-white text-decoration-none fw-semibold">
-          <i class="bi bi-laptop me-1"></i> Códigos de Windows
-        </a>
-        <a href="#" class="d-block text-white text-decoration-none fw-semibold">
-          <i class="bi bi-moon me-1"></i> Nightreign
-        </a>
-        <a href="#" class="d-block text-white text-decoration-none fw-semibold">
-          <i class="bi bi-credit-card-2-front me-1"></i> Tarjetas
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ================================================================= -->
-  <!-- OFFCANVAS (MENÚ LATERAL DE CATEGORÍAS)                            -->
-  <!-- ================================================================= -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCategorias"
-    aria-labelledby="offcanvasCategoriasLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title fw-bold" id="offcanvasCategoriasLabel">Categorías</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
-    </div>
-    <div class="offcanvas-body">
-      <nav class="nav flex-column">
-        <a href="#" class="nav-link">
-          <i class="bi bi-controller me-2"></i> Juegos Baratos
-        </a>
-        <a href="#" class="nav-link">
-          <i class="bi bi-laptop me-2"></i> Códigos de Windows
-        </a>
-        <a href="#" class="nav-link">
-          <i class="bi bi-moon me-2"></i> NightReign
-        </a>
-        <a href="#" class="nav-link">
-          <i class="bi bi-credit-card-2-front me-2"></i> Tarjetas
-        </a>
-      </nav>
-    </div>
-  </div>
-
-  <!-- 
-    NOTA: El script de Bootstrap se ha movido fuera del fragmento a la plantilla principal
-    para evitar cargarlo múltiples veces si se usan otros fragmentos. Si solo lo usas aquí,
-    puedes dejar la línea <script> aquí sin problema.
-  -->
 
 </div>
+
+</body>
 </html>
