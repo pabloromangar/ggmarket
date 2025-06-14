@@ -2,6 +2,7 @@ package com.example.ggmarket.controller;
 
 import com.example.ggmarket.model.Pedido;
 import com.example.ggmarket.model.ProductoFisico;
+import com.example.ggmarket.service.CloudinaryService;
 import com.example.ggmarket.service.PedidoService;
 import com.example.ggmarket.service.ProductoFisicoService;
 
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -29,6 +32,8 @@ public class PanelVendedorController {
     @Autowired
     private ProductoFisicoService productoFisicoService;
 
+    @Autowired
+    private CloudinaryService cloudinaryService; // Asegúrate de tener este servicio para manejar imágenes
     @Autowired
     private PedidoService pedidoService;
 
@@ -78,30 +83,34 @@ public class PanelVendedorController {
      * Procesa tanto la creación de un nuevo producto como la actualización de uno
      * existente.
      */
-    @PostMapping("/productos/guardar")
-    public String saveOrUpdateProduct(@ModelAttribute ProductoFisico producto,
+     @PostMapping("/productos/guardar")
+    public String saveOrUpdateProduct(
+            @ModelAttribute("productoFisico") ProductoFisico productoForm,
+            @RequestParam("imagenFile") MultipartFile imagenFile, // <-- Nuevo parámetro para el archivo
             @AuthenticationPrincipal UserDetails userDetails,
             RedirectAttributes redirectAttributes) {
+        
         try {
-            // Si el producto tiene un ID, es una actualización. Si no, es una creación.
-            boolean isNew = producto.getId() == null;
+            // --- LÓGICA DE SUBIDA DE IMAGEN ---
+            // Comprobamos si el usuario ha subido un archivo nuevo.
+            if (!imagenFile.isEmpty()) {
+                // Si hay un archivo, lo subimos a Cloudinary.
+                String imageUrl = cloudinaryService.uploadFile(imagenFile);
+                // Guardamos la URL segura devuelta por Cloudinary en nuestro objeto.
+                productoForm.setImagenUrl(imageUrl);
+            }
+            // Si no se sube un archivo nuevo en una edición, se mantendrá la URL existente.
+            // --- FIN DE LA LÓGICA DE IMAGEN ---
+
+
+            // La lógica de guardar/actualizar el producto sigue igual.
+            boolean isNew = productoForm.getId() == null;
 
             if (isNew) {
-                productoFisicoService.save(producto, userDetails.getUsername());
+                productoFisicoService.save(productoForm, userDetails.getUsername());
                 redirectAttributes.addFlashAttribute("successMessage", "Producto creado con éxito.");
             } else {
-                // Para la actualización, también verificamos la propiedad
-                ProductoFisico existingProduct = productoFisicoService
-                        .findProductoByIdAndVendedorEmail(producto.getId(), userDetails.getUsername())
-                        .orElseThrow(
-                                () -> new AccessDeniedException("Intento de modificación de producto no autorizado."));
-
-                // Actualizamos los campos y guardamos
-                existingProduct.setNombre(producto.getNombre());
-                existingProduct.setDescripcion(producto.getDescripcion());
-                existingProduct.setPrecio(producto.getPrecio());
-                existingProduct.setImagenUrl(producto.getImagenUrl());
-                productoFisicoService.update(existingProduct);
+                productoFisicoService.update(productoForm, userDetails.getUsername()); // Pasamos los dos parámetros
                 redirectAttributes.addFlashAttribute("successMessage", "Producto actualizado con éxito.");
             }
         } catch (Exception e) {

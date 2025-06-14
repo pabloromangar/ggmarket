@@ -56,11 +56,24 @@ public class ProductoFisicoService {
             //    Si es false (o si el producto no se encontró), se devuelve un Optional vacío.
     }
 
-      public void update(ProductoFisico productoActualizado) {
-        // El método .save() de JpaRepository es inteligente.
-        // Si el objeto que le pasas tiene un ID que ya existe en la tabla,
-        // JPA ejecutará una sentencia UPDATE en lugar de un INSERT.
-        productoFisicoRepository.save(productoActualizado);
+       public void update(ProductoFisico productoForm, String vendedorEmail) {
+        // Buscamos el producto existente en la BD, asegurándonos de que pertenece al vendedor.
+        ProductoFisico productoExistente = findProductoByIdAndVendedorEmail(productoForm.getId(), vendedorEmail)
+            .orElseThrow(() -> new AccessDeniedException("Intento de modificación de producto no autorizado."));
+
+        // Actualizamos los campos.
+        productoExistente.setNombre(productoForm.getNombre());
+        productoExistente.setDescripcion(productoForm.getDescripcion());
+        productoExistente.setPrecio(productoForm.getPrecio());
+
+        // IMPORTANTE: Solo actualizamos la URL de la imagen si se proporcionó una nueva.
+        // Si productoForm.getImagenUrl() es null, no hacemos nada y se conserva la antigua.
+        if (productoForm.getImagenUrl() != null) {
+            productoExistente.setImagenUrl(productoForm.getImagenUrl());
+        }
+
+        // Guardamos la entidad actualizada.
+        productoFisicoRepository.save(productoExistente);
     }
      /**
      * ========================================================================
