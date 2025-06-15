@@ -1,77 +1,108 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<!-- Este archivo solo contiene los fragmentos, el <body> está vacío -->
 <body>
 
-<!--
+    <!--
   ====================================================================================
-  Fragmento de Head
-  ====================================================================================
--->
-<head th:fragment="head(pageTitle)">
-    <meta charset="UTF-8">
-    <title th:text="${pageTitle} + ' | GGMarket'"></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" th:href="@{/css/custom.css}">
-    <meta name="_csrf" th:content="${_csrf.token}" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-</head>
-
-
-<!--
-  ====================================================================================
-  Fragmento de Header Principal (con la estructura de dos niveles)
+  Fragmento de Head - Sin cambios.
   ====================================================================================
 -->
-<div th:fragment="header">
 
-    <!-- NIVEL 1: Header Principal -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container px-4">
-            <a class="navbar-brand py-0 my-0" th:href="@{/}">
-                <img th:src="@{/img/logo.png}" alt="GG" style="width: 150px;">
-            </a>
-            <div class="d-flex align-items-center d-lg-none">
-                <button type="button" class="btn btn-outline-light position-relative me-2" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
-                    <i class="bi bi-cart3 fs-4"></i>
-                    <span th:if="${itemsEnCarrito > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        <span th:text="${itemsEnCarrito}"></span>
-                    </span>
-                </button>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="mainNavbarContent">
-                <form class="flex-grow-1 mx-lg-5 my-3 my-lg-0 position-relative" style="max-width: 600px;">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
-                    <input type="text" id="buscador" class="form-control px-5" placeholder="Buscar en GGMarket...">
-                    <div id="resultados" class="position-absolute bg-white text-dark border rounded shadow mt-2" style="display: none; width: 100%; z-index: 100;"></div>
-                </form>
-                <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-light position-relative d-none d-lg-block" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+    <head th:fragment="head(pageTitle)">
+        <meta charset="UTF-8">
+        <title th:text="${pageTitle} + ' | GGMarket'"></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" th:href="@{/css/custom.css}">
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    </head>
+
+
+    <!--
+  ====================================================================================
+  Fragmento de Header Principal - Con la lógica de ADMIN añadida
+  ====================================================================================
+-->
+    <div th:fragment="header">
+
+        <!-- NIVEL 1: Header Principal (bg-primary) -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container px-4">
+
+                <!-- Logo -->
+                <a class="navbar-brand py-0 my-0" th:href="@{/}">
+                    <img th:src="@{/img/logo.png}" alt="GG" style="width: 150px;">
+                </a>
+
+                <!-- Acciones en Móvil -->
+                <div class="d-flex align-items-center d-lg-none">
+                    <button type="button" class="btn btn-outline-light position-relative me-2"
+                        data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
                         <i class="bi bi-cart3 fs-4"></i>
-                        <span th:if="${itemsEnCarrito > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span th:if="${itemsEnCarrito > 0}"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             <span th:text="${itemsEnCarrito}"></span>
                         </span>
                     </button>
-                    <div sec:authorize="!isAuthenticated()">
-                        <a th:href="@{/login}" class="btn btn-outline-light">Iniciar sesión</a>
-                    </div>
-                    <div sec:authorize="isAuthenticated()" class="dropdown">
-                        <a href="#" class="btn btn-outline-light dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i>
-                            <span class="d-none d-lg-inline" th:text="${#authentication.name}"></span>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbarContent">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <!-- Contenido Colapsable -->
+                <div class="collapse navbar-collapse" id="mainNavbarContent">
+
+                    <!-- Barra de Búsqueda -->
+                    <form class="flex-grow-1 mx-lg-5 my-3 my-lg-0 position-relative" style="max-width: 600px;">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
+                        <input type="text" id="buscador" class="form-control px-5" placeholder="Buscar en GGMarket...">
+                        <div id="resultados" class="position-absolute bg-white text-dark border rounded shadow mt-2"
+                            style="display: none; width: 100%; z-index: 100;"></div>
+                    </form>
+
+                    <!-- Acciones de Usuario -->
+                    <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
+                        <button type="button" class="btn btn-outline-light position-relative d-none d-lg-block"
+                            data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                            <i class="bi bi-cart3 fs-4"></i>
+                            <span th:if="${itemsEnCarrito > 0}"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span th:text="${itemsEnCarrito}"></span>
+                            </span>
+                        </button>
+                        <!-- Login/Registro -->
+                        <div sec:authorize="!isAuthenticated()">
+                            <a th:href="@{/login}" class="text-white text-decoration-none">Iniciar sesión</a>
+                            |
+                            <a th:href="@{/registro}" class="text-white text-decoration-none">Registrarse</a>
+                        </div>
+                        <!-- Menú de Usuario Logueado -->
+                        <div sec:authorize="isAuthenticated()" class="dropdown">
+                            <a href="#" class="btn btn-outline-light dropdown-toggle d-flex align-items-center"
+                                role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <span class="d-none d-lg-inline" th:text="${#authentication.name}"></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                             <li><a class="dropdown-item" th:href="@{/perfil}">Mi Perfil</a></li>
                             <li><a class="dropdown-item" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
+                            
+                            <!-- 
+                              ========= LÍNEA AÑADIDA =========
+                              Este bloque <li> completo solo se renderizará en el HTML
+                              si el usuario autenticado tiene el rol 'ADMIN'.
+                            -->
                             <li sec:authorize="hasRole('ADMIN')">
-                                <a class="dropdown-item" th:href="@{/admin}"><i class="bi bi-shield-lock-fill me-2"></i>Panel de Administración</a>
+                                <a class="dropdown-item" th:href="@{/admin}">
+                                    <i class="bi bi-shield-lock-fill me-2"></i>Panel de Administración
+                                </a>
                             </li>
+                            <!-- =============================== -->
+                            
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form th:action="@{/logout}" method="post"><button type="submit" class="dropdown-item">Cerrar Sesión</button></form>
@@ -79,10 +110,12 @@
                         </ul>
                     </div>
                 </div>
+                 <!-- Enlaces de Categorías para Móvil -->
                 <ul class="navbar-nav d-lg-none mt-3">
-                    <li class="nav-item"><a class="nav-link" th:href="@{/marketplace}">Marketplace</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Juegos Baratos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Códigos de Windows</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/tienda/marketplace}">Marketplace</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/tienda/tipo/juego}">Juegos Baratos</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/tienda/plataforma/windows}">Códigos de Windows</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/tienda/tipo/tarjeta}">Tarjetas de Saldo</a></li>
                 </ul>
             </div>
         </div>
@@ -92,10 +125,10 @@
     <div class="bg-secondary shadow-sm d-none d-lg-flex">
         <div class="container px-4 py-2">
             <div class="d-flex justify-content-center gap-5">
-                <a class="text-white text-decoration-none fw-semibold" th:href="@{/marketplace}"><i class="bi bi-shop me-1"></i> Marketplace</a>
-                <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-controller me-1"></i> Juegos Baratos</a>
-                <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-laptop me-1"></i> Códigos de Windows</a>
-                <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-credit-card-2-front me-1"></i> Tarjetas de Saldo</a>
+                <a class="text-white text-decoration-none fw-semibold" th:href="@{/tienda/marketplace}"><i class="bi bi-shop me-1"></i> Marketplace</a>
+                <a class="text-white text-decoration-none fw-semibold" th:href="@{/tienda/tipo/juegos}"><i class="bi bi-controller me-1"></i> Juegos Baratos</a>
+                <a class="text-white text-decoration-none fw-semibold" th:href="@{/tienda/plataforma/windows}"><i class="bi bi-laptop me-1"></i> Códigos de Windows</a>
+                <a class="text-white text-decoration-none fw-semibold"th:href="@{/tienda/tipo/tarjetas}"><i class="bi bi-credit-card-2-front me-1"></i> Tarjetas de Saldo</a>
             </div>
         </div>
     </div>

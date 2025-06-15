@@ -72,9 +72,9 @@
                         <li th:each="item : ${cartItems}" class="list-group-item d-flex justify-content-between lh-sm bg-dark text-white">
                             <div>
                                 <h6 class="my-0" th:text="${item.nombre}">Nombre Producto</h6>
-                                <small class="text-muted" th:text="'Cantidad: ' + ${item.cantidad}">Cantidad</small>
+                                <small class="text-muted-light" th:text="'Cantidad: ' + ${item.cantidad}">Cantidad</small>
                             </div>
-                            <span class="text-muted" th:text="'€' + ${#numbers.formatDecimal(item.precio * item.cantidad, 1, 2)}">€0.00</span>
+                            <span class="text-muted-light" th:text="'€' + ${#numbers.formatDecimal(item.precio * item.cantidad, 1, 2)}">€0.00</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between bg-dark text-white">
                             <strong class="h5">Total (EUR)</strong>
