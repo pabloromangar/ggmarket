@@ -4,7 +4,9 @@ import com.example.ggmarket.model.ProductoDigital;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductoDigitalRepository extends JpaRepository<ProductoDigital, Long> {
@@ -23,4 +25,7 @@ public interface ProductoDigitalRepository extends JpaRepository<ProductoDigital
      * Asumiendo que tu entidad ProductoDigital tiene un campo 'tipo'.
      */
     List<ProductoDigital> findByTipoOrderByNombreAsc(String tipo, PageRequest pageable);
+
+        Page<ProductoDigital> findByTipoIgnoreCase(String tipo, Pageable pageable);
+            Page<ProductoDigital> findByPlataformaIgnoreCase(String plataforma, Pageable pageable);
 }

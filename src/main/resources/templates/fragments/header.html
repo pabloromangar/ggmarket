@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
+<!-- Este archivo solo contiene los fragmentos, el <body> está vacío -->
 <body>
 
 <!--
   ====================================================================================
-  Fragmento de Head - Sin cambios.
+  Fragmento de Head
   ====================================================================================
 -->
 <head th:fragment="head(pageTitle)">
@@ -22,24 +23,17 @@
 
 <!--
   ====================================================================================
-  Fragmento de Header Principal - ESTRUCTURA DE DOS NIVELES
+  Fragmento de Header Principal (con la estructura de dos niveles)
   ====================================================================================
 -->
 <div th:fragment="header">
 
-    <!-- 
-      NIVEL 1: Header Principal (bg-primary)
-      Este navbar contiene el logo, la búsqueda y las acciones. Se colapsa en móvil.
-    -->
+    <!-- NIVEL 1: Header Principal -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container px-4">
-
-            <!-- Logo (siempre visible) -->
             <a class="navbar-brand py-0 my-0" th:href="@{/}">
                 <img th:src="@{/img/logo.png}" alt="GG" style="width: 150px;">
             </a>
-
-            <!-- Acciones en Móvil (Carrito y Hamburguesa) -->
             <div class="d-flex align-items-center d-lg-none">
                 <button type="button" class="btn btn-outline-light position-relative me-2" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
                     <i class="bi bi-cart3 fs-4"></i>
@@ -47,31 +41,23 @@
                         <span th:text="${itemsEnCarrito}"></span>
                     </span>
                 </button>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent" aria-controls="mainNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
-
-            <!-- Contenido Colapsable (lo que va dentro de la hamburguesa en móvil) -->
             <div class="collapse navbar-collapse" id="mainNavbarContent">
-
-                <!-- Barra de Búsqueda (centrada en desktop) -->
                 <form class="flex-grow-1 mx-lg-5 my-3 my-lg-0 position-relative" style="max-width: 600px;">
                     <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
                     <input type="text" id="buscador" class="form-control px-5" placeholder="Buscar en GGMarket...">
                     <div id="resultados" class="position-absolute bg-white text-dark border rounded shadow mt-2" style="display: none; width: 100%; z-index: 100;"></div>
                 </form>
-
-                <!-- Acciones de Usuario (alineadas al final) -->
                 <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
-                    <!-- Carrito (solo visible en desktop) -->
                     <button type="button" class="btn btn-outline-light position-relative d-none d-lg-block" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
                         <i class="bi bi-cart3 fs-4"></i>
                         <span th:if="${itemsEnCarrito > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             <span th:text="${itemsEnCarrito}"></span>
                         </span>
                     </button>
-                    <!-- Lógica de Autenticación -->
                     <div sec:authorize="!isAuthenticated()">
                         <a th:href="@{/login}" class="btn btn-outline-light">Iniciar sesión</a>
                     </div>
@@ -83,6 +69,9 @@
                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                             <li><a class="dropdown-item" th:href="@{/perfil}">Mi Perfil</a></li>
                             <li><a class="dropdown-item" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item" th:href="@{/admin}"><i class="bi bi-shield-lock-fill me-2"></i>Panel de Administración</a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form th:action="@{/logout}" method="post"><button type="submit" class="dropdown-item">Cerrar Sesión</button></form>
@@ -90,11 +79,6 @@
                         </ul>
                     </div>
                 </div>
-                 <!-- 
-                   ENLACES DE CATEGORÍAS (PARA MÓVIL)
-                   Estos enlaces aparecen dentro de la hamburguesa.
-                   Usamos d-lg-none para que se oculten en desktop.
-                 -->
                 <ul class="navbar-nav d-lg-none mt-3">
                     <li class="nav-item"><a class="nav-link" th:href="@{/marketplace}">Marketplace</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Juegos Baratos</a></li>
@@ -104,14 +88,10 @@
         </div>
     </nav>
 
-    <!-- 
-      NIVEL 2: Barra de Categorías (bg-secondary)
-      - Usamos 'd-none d-lg-flex' para que esta barra se oculte COMPLETAMENTE en móvil
-        y solo aparezca como un contenedor flex en escritorio.
-    -->
+    <!-- NIVEL 2: Barra de Categorías para Desktop -->
     <div class="bg-secondary shadow-sm d-none d-lg-flex">
         <div class="container px-4 py-2">
-            <div class="d-flex justify-content-between gap-5">
+            <div class="d-flex justify-content-center gap-5">
                 <a class="text-white text-decoration-none fw-semibold" th:href="@{/marketplace}"><i class="bi bi-shop me-1"></i> Marketplace</a>
                 <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-controller me-1"></i> Juegos Baratos</a>
                 <a class="text-white text-decoration-none fw-semibold" href="#"><i class="bi bi-laptop me-1"></i> Códigos de Windows</a>

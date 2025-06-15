@@ -20,4 +20,6 @@ public class ProductoFisico {
     @ManyToOne
     @JoinColumn(name = "vendedor_id")
     private Usuario vendedor;
+    
+    private boolean vendido = false;
 }

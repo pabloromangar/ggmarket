@@ -5,38 +5,38 @@
 
   <!-- 
     ====================================================================================
-      FRAGMENTO DE TARJETA DE PRODUCTO RESPONSIVE
-      - Muestra una tarjeta vertical en Escritorio (lg y superior).
-      - Muestra una lista horizontal en Móvil y Tablet (hasta md).
+      FRAGMENTO RESPONSIVE PARA LA TARJETA DE PRODUCTO FÍSICO
     ====================================================================================
   -->
-  <div th:fragment="producto-card(producto)">
+  <div th:fragment="producto-fisico-card(producto)">
     <div class="col h-100">
 
       <!--
         =========================================================
           VERSIÓN ESCRITORIO (CARD VERTICAL)
-          - d-none: Oculto por defecto (en móvil).
-          - d-lg-block: Visible como bloque en pantallas grandes (lg) y superiores.
+          - Visible solo en pantallas grandes (lg) y superiores.
         =========================================================
       -->
       <div class="card h-100 position-relative overflow-hidden custom-card bg-info d-none d-lg-block">
-        <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="text-decoration-none">
+        <a th:href="@{/tienda/productoFisico/{id}(id=${producto.id})}" class="text-decoration-none">
           <div class="card-header p-0 position-relative">
+            <!-- Lógica de imagen -->
             <img th:if="${#strings.isEmpty(producto.imagenUrl)}" th:src="@{/img/default.webp}" class="card-img-top" alt="Imagen por defecto">
             <img th:unless="${#strings.isEmpty(producto.imagenUrl)}" th:src="${producto.imagenUrl}" class="card-img-top" th:alt="${producto.nombre}">
-            <span class="badge position-absolute bottom-0 w-100 text-center" th:text="${producto.plataforma}"></span>
           </div>
           <div class="card-body position-relative bg-info text-white p-3">
+            <!-- Información específica del producto físico -->
+            <p class="card-text small mb-1" th:text="'Vendido por: ' + ${producto.vendedor?.nombre}"></p>
             <h6 class="card-title" th:text="${producto.nombre}"></h6>
-            <p class="card-text text-warning"><strong th:text="${producto.region}"></strong></p>
             <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
           </div>
         </a>
-        <div class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info py-1 my-0">
-          <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-sm btn-success w-100 mb-2 text-white">Añadir al Carrito</a>
-          <button sec:authorize="isAuthenticated()" class="btn btn-sm btn-success w-100 mb-2 text-white btn-add-to-cart" th:data-product-id="${producto.id}">Añadir al Carrito</button>
-          <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="btn btn-sm btn-primary w-100 text-white">Explorar</a>
+        <!--
+          ACCIÓN: Comprar Ahora
+          Un único botón que lleva al flujo de compra directa.
+        -->
+        <div class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info p-2">
+          <a th:href="@{/comprar/fisico/{id}(id=${producto.id})}" class="btn btn-sm btn-success w-100 text-white">Comprar Ahora</a>
         </div>
       </div>
 
@@ -44,34 +44,30 @@
       <!--
         =========================================================
           VERSIÓN MÓVIL (LISTA HORIZONTAL)
-          - d-block: Visible como bloque por defecto (en móvil).
-          - d-lg-none: Oculto en pantallas grandes (lg) y superiores.
+          - Visible solo en pantallas medianas e inferiores (hasta lg).
         =========================================================
       -->
       <div class="card bg-info h-100 p-2 d-block d-lg-none">
         <div class="d-flex align-items-center h-100">
           
           <!-- Columna Izquierda: Imagen -->
-          <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="flex-shrink-0">
+          <a th:href="@{/tienda/productoFisico/{id}(id=${producto.id})}" class="flex-shrink-0">
             <img th:if="${#strings.isEmpty(producto.imagenUrl)}" th:src="@{/img/default.webp}" alt="Imagen por defecto" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
             <img th:unless="${#strings.isEmpty(producto.imagenUrl)}" th:src="${producto.imagenUrl}" th:alt="${producto.nombre}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
           </a>
           
-          <!-- Columna Central: Información (ocupa el espacio sobrante) -->
-          <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="flex-grow-1 mx-3 text-white text-decoration-none">
+          <!-- Columna Central: Información -->
+          <a th:href="@{/tienda/productoFisico/{id}(id=${producto.id})}" class="flex-grow-1 mx-3 text-white text-decoration-none">
+            <p class="small mb-0 text-white-50" th:text="'Vendido por: ' + ${producto.vendedor?.nombre}"></p>
             <h6 class="mb-1" th:text="${producto.nombre}"></h6>
             <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
           </a>
 
-          <!-- Columna Derecha: Botón de Añadir al Carrito -->
+          <!-- Columna Derecha: Botón de Comprar Ahora -->
           <div class="flex-shrink-0">
-            <!-- Lógica de botones de añadir al carrito -->
-            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-success text-white">
-                <i class="bi bi-cart-plus fs-4"></i>
+            <a th:href="@{/comprar/fisico/{id}(id=${producto.id})}" class="btn btn-success text-white">
+                <i class="bi bi-bag-check-fill fs-4"></i>
             </a>
-            <button sec:authorize="isAuthenticated()" class="btn btn-success text-white btn-add-to-cart" th:data-product-id="${producto.id}">
-                <i class="bi bi-cart-plus fs-4"></i>
-            </button>
           </div>
 
         </div>

@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    if (cartCounter) {
+    const spanNumero = cartCounter.querySelector('span:first-child');
+    if (totalItems > 0) {
+        if (spanNumero) {
+            spanNumero.textContent = totalItems;
+        }
+        cartCounter.style.display = 'flex';
+    } else {
+        cartCounter.style.display = 'none';
+    }
+}
+
     // ===================================================================
     // FUNCIÓN: Cargar el contenido del carrito
     // ===================================================================

@@ -21,7 +21,7 @@
                     <div class="card-header bg-secondary-subtle text-dark">
                         <h5 class="mb-0">Mis Datos</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body bg-secondary">
                         <p><strong>Nombre:</strong> <span th:text="${usuario.nombre}"></span></p>
                         <p><strong>Email:</strong> <span th:text="${usuario.email}"></span></p>
                         <p><strong>Rol Actual:</strong> 
@@ -48,7 +48,7 @@
                         </a>
                         
                         <!-- Enlace al panel de admin (SOLO para Admins) -->
-                         <a th:href="@{/admin/productos-digitales}" class="list-group-item list-group-item-action bg-dark text-white"
+                         <a th:href="@{/admin}" class="list-group-item list-group-item-action bg-dark text-white"
                            th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                             <i class="bi bi-shield-lock-fill me-2"></i>Panel de Administración
                         </a>

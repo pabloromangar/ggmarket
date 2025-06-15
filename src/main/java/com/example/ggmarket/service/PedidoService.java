@@ -25,7 +25,7 @@ public class PedidoService {
 
     public PedidoService(PedidoRepository pedidoRepository, CarritoService carritoService,
             CarritoViewService carritoViewService, UsuarioRepository usuarioRepository,
-            ClaveDigitalRepository claveDigitalRepository, 
+            ClaveDigitalRepository claveDigitalRepository,
             ProductoFisicoRepository productoFisicoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioRepository = usuarioRepository;
@@ -74,7 +74,8 @@ public class PedidoService {
                 ClaveDigital claveParaVender = claveDigitalRepository
                         .findTopByProductoDigitalAndUsadaIsFalse(productoComprado)
                         .orElseThrow(() -> new RuntimeException("Stock agotado para " + productoComprado.getNombre()));
-
+                nuevoPedido.setTipoPedido("DIGITAL");
+                nuevoPedido.setEstado("COMPLETADO");
                 // 4b. Marcar la clave como usada para que no se vuelva a vender
                 claveParaVender.setUsada(true);
 
@@ -111,54 +112,69 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido crearPedidoParaProductoFisico(Long productoId, String emailComprador) {
-        Usuario comprador = usuarioRepository.findByEmail(emailComprador)
-                .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
+public Pedido crearPedidoParaProductoFisico(Long productoId, String emailComprador) {
+    // 1. Buscamos las entidades necesarias
+    Usuario comprador = usuarioRepository.findByEmail(emailComprador)
+        .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
 
-        ProductoFisico producto = productoFisicoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto físico no encontrado"));
+    ProductoFisico producto = productoFisicoRepository.findById(productoId)
+        .orElseThrow(() -> new RuntimeException("Producto físico no encontrado"));
 
-        // Crear el Pedido
-        Pedido pedido = new Pedido();
-        pedido.setUsuario(comprador);
-        pedido.setTotal(BigDecimal.valueOf(producto.getPrecio()));
-        pedido.setTipoPedido("FISICO");
-        pedido.setEstado("PENDIENTE_ENVIO"); // <-- Nuevo estado inicial
-
-        // Crear el Detalle del Pedido
-        DetallePedido detalle = new DetallePedido();
-        detalle.setPedido(pedido);
-        detalle.setProductoFisico(producto); // <-- Asignamos el producto físico
-        detalle.setCantidad(1);
-        detalle.setPrecioUnitario(BigDecimal.valueOf(producto.getPrecio()));
-
-        // Añadimos el detalle al pedido
-        pedido.getDetalles().add(detalle);
-
-        return pedidoRepository.save(pedido);
-    }
-
-    public List<Pedido> findPedidosParaVendedor(String emailVendedor) {
-    Usuario vendedor = usuarioRepository.findByEmail(emailVendedor)
-        .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
-    return pedidoRepository.findDistinctByDetalles_ProductoFisico_Vendedor(vendedor);
-}
-
-// Cambia el estado del pedido a "ENVIADO"
-@Transactional
-public void confirmarEnvio(Long pedidoId, String emailVendedor) {
-    Pedido pedido = pedidoRepository.findById(pedidoId)
-        .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
-        
-    // Comprobación de seguridad
-    boolean perteneceAlVendedor = pedido.getDetalles().stream()
-        .anyMatch(d -> d.getProductoFisico() != null && d.getProductoFisico().getVendedor().getEmail().equals(emailVendedor));
-
-    if (!perteneceAlVendedor) {
-        throw new AccessDeniedException("No tienes permiso para modificar este pedido.");
+    // 2. Comprobación de seguridad: No se puede comprar un producto ya vendido
+    if (producto.isVendido()) {
+        throw new IllegalStateException("Este producto ya no está disponible porque ha sido vendido.");
     }
     
-    pedido.setEstado("ENVIADO");
-    pedidoRepository.save(pedido);
+    // 3. Creamos el pedido y el detalle, como antes
+    Pedido pedido = new Pedido();
+    pedido.setUsuario(comprador);
+    pedido.setTotal(BigDecimal.valueOf(producto.getPrecio()));
+    pedido.setTipoPedido("FISICO");
+    pedido.setEstado("PENDIENTE_ENVIO");
+
+    DetallePedido detalle = new DetallePedido();
+    detalle.setPedido(pedido);
+    detalle.setProductoFisico(producto);
+    detalle.setCantidad(1);
+    detalle.setPrecioUnitario(BigDecimal.valueOf(producto.getPrecio()));
+
+    pedido.getDetalles().add(detalle);
+
+    // 4. Guardamos el nuevo pedido (esto lo hace persistente)
+    Pedido pedidoGuardado = pedidoRepository.save(pedido);
+
+    // 5. ========= LÓGICA CORREGIDA Y DEFINITIVA =========
+    // En lugar de borrar el producto, lo marcamos como vendido.
+    producto.setVendido(true);
+    // Y guardamos el cambio. Como 'producto' ya tiene un ID, esto hará un UPDATE.
+    productoFisicoRepository.save(producto);
+    // ===================================================
+    
+    return pedidoGuardado;
 }
+
+    public List<Pedido> findPedidosParaVendedor(String emailVendedor) {
+        Usuario vendedor = usuarioRepository.findByEmail(emailVendedor)
+                .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
+        return pedidoRepository.findDistinctByDetalles_ProductoFisico_Vendedor(vendedor);
+    }
+
+    // Cambia el estado del pedido a "ENVIADO"
+    @Transactional
+    public void confirmarEnvio(Long pedidoId, String emailVendedor) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+        // Comprobación de seguridad
+        boolean perteneceAlVendedor = pedido.getDetalles().stream()
+                .anyMatch(d -> d.getProductoFisico() != null
+                        && d.getProductoFisico().getVendedor().getEmail().equals(emailVendedor));
+
+        if (!perteneceAlVendedor) {
+            throw new AccessDeniedException("No tienes permiso para modificar este pedido.");
+        }
+
+        pedido.setEstado("ENVIADO");
+        pedidoRepository.save(pedido);
+    }
 }

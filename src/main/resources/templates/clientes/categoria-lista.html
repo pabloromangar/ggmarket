@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-primary text-white">
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <!-- El título es dinámico, viene del controlador -->
+        <h1 class="mb-4" th:text="${pageTitle}"></h1>
+
+        <!-- Mensaje si no hay productos en esta categoría -->
+        <div th:if="${productos.isEmpty()}" class="text-center p-5">
+            <h3>No se encontraron productos en esta categoría.</h3>
+        </div>
+
+        <!-- Grid de productos -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:unless="${productos.isEmpty()}">
+            <th:block th:each="producto : ${productos.content}">
+                <!-- Reutilizamos nuestro fragmento de tarjeta, ¡muy eficiente! -->
+                <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
+            </th:block>
+        </div>
+
+        <!-- Paginación dinámica que funciona con ambos tipos de filtro -->
+        <nav th:if="${productos.totalPages > 1}" class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${productos.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/tienda/{type}/{value}(type=${currentFilterType}, value=${currentFilterValue}, page=${productos.number - 1})}">Anterior</a>
+                </li>
+                <!-- ... lógica para números de página ... -->
+                <li class="page-item" th:classappend="${productos.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/tienda/{type}/{value}(type=${currentFilterType}, value=${currentFilterValue}, page=${productos.number + 1})}">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

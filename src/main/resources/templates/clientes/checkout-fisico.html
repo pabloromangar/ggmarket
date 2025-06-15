@@ -8,7 +8,7 @@
     <main class="container my-5">
         <h1>Confirmar Compra</h1>
         <div class="card bg-dark text-white border-secondary">
-            <div class="card-body">
+            <div class="card-body bg-secondary p-4">
                 <h4 th:text="${producto.nombre}"></h4>
                 <p th:text="'Vendido por: ' + ${producto.vendedor.nombre}"></p>
                 <p class="fs-3 fw-bold" th:text="'Precio: €' + ${producto.precio}"></p>
@@ -28,7 +28,7 @@
                     <!-- Token de seguridad CSRF, siempre necesario en formularios POST -->
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     
-                    <button type="submit" class="btn btn-primary btn-lg">Confirmar y Realizar Pedido</button>
+                    <button type="submit" class="btn btn-light btn-lg">Confirmar y Realizar Pedido</button>
                 </form>
                 <!-- ====================================== -->
             </div>

@@ -26,41 +26,8 @@
         <div class="row row-cols-1 row-cols-md-4 g-4">
             <!-- Tu bucle 'th:each' para los productos va aquí... -->
             <div class="col" th:each="producto : ${productos.content}">
-                <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}" class="text-decoration-none text-dark">
-                    <!-- ... El contenido de tu tarjeta de producto ... -->
-                    <div class="card h-100 position-relative overflow-hidden custom-card bg-info">
-                        <div class="card-header p-0 position-relative">
-                            <img th:if="${#strings.isEmpty(producto.imagenUrl)}"
-     th:src="@{/img/default.webp}"
-     class="card-img-top" alt="Imagen por defecto">
+                                   <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
 
-<!-- Opción B: A menos que la imagen esté vacía, muestra la imagen del producto -->
-<img th:unless="${#strings.isEmpty(producto.imagenUrl)}"
-     th:src="${producto.imagenUrl}"
-     class="card-img-top" alt="Imagen del producto">
-                            <span class="badge position-absolute bottom-0 w-100 text-center"
-                                th:text="${producto.plataforma}"></span>
-                        </div>
-                        <div class="card-body position-relative bg-info text-white p-3">
-                            <span class="badge badge-custom start-0 position-absolute text-center w-100"
-                                th:text="${producto.plataforma}"></span>
-                            <h6 class="card-title" th:text="${producto.nombre}">Elden Ring</h6>
-                            <p class="card-text text-warning"><strong th:text="${producto.region}"></strong></p>
-                            <span class="fw-bold" th:text="${producto.precio} + ' €'"></span>
-                        </div>
-                        <div
-                            class="card-actions position-absolute bottom-0 start-0 w-100 text-center bg-info py-1 my-0">
-                            <!-- ... Tus botones de 'Añadir al carrito' ... -->
-                            <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
-                                class="btn btn-sm btn-success w-100 mb-2 text-white">Añadir al Carrito</a>
-                            <button sec:authorize="isAuthenticated()"
-                                class="btn btn-sm btn-success w-100 mb-2 text-white btn-add-to-cart"
-                                th:data-product-id="${producto.id}">Añadir al Carrito</button>
-                            <a th:href="@{/tienda/productoDigital/{id}(id=${producto.id})}"
-                                class="btn btn-sm btn-primary w-100 text-white">Explorar</a>
-                        </div>
-                    </div>
-                </a>
             </div>
         </div>
 

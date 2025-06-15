@@ -19,45 +19,44 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-   @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests(auth -> auth
-            // --- RUTAS PÚBLICAS ---
-            // Cualquiera puede acceder a estas URLs
-            .requestMatchers(
-                "/",                  // Página principal
-                "/tienda/**",            // Página del catálogo
-                "/producto/**",       // Detalle de cualquier producto (ej: /producto/123)
-                "/registro",          // Página de registro
-                "/login",             // Página de login
-                "/css/**",            // Archivos CSS
-                "/js/**",             // Archivos JavaScript
-                "/img/**"             // Imágenes
-            ).permitAll()
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth
+                // --- RUTAS PÚBLICAS ---
+                // Cualquiera puede acceder a estas URLs
+                .requestMatchers(
+                        "/", // Página principal
+                        "/tienda/**", // Página del catálogo
+                        "/producto/**", // Detalle de cualquier producto (ej: /producto/123)
+                        "/registro", // Página de registro
+                        "/login", // Página de login
+                        "/css/**", // Archivos CSS
+                        "/js/**", // Archivos JavaScript
+                        "/img/**",
+                        "/webjars/**",
+                        "/registro"
+                ).permitAll()
 
-            // --- RUTAS DE ADMINISTRADOR ---
-            // Solo usuarios con rol 'ADMIN' pueden acceder
-            .requestMatchers("/admin/**").hasRole("ADMIN")
-            .requestMatchers("/perfil/**").authenticated()
-            // --- CUALQUIER OTRA RUTA ---
-            // Todas las demás URLs requieren que el usuario esté autenticado
-            .anyRequest().authenticated()
-        )
-        // La configuración de formLogin se encarga de la redirección automática
-        .formLogin(form -> form
-            .loginPage("/login")
-            .loginProcessingUrl("/login")
-            .usernameParameter("email")
-            .defaultSuccessUrl("/", true)
-            .failureUrl("/login?error=true")
-            .permitAll()
-        )
-        .logout(logout -> logout
-            .logoutUrl("/logout")
-            .logoutSuccessUrl("/login?logout=true")
-            .permitAll()
-        );
+                // --- RUTAS DE ADMINISTRADOR ---
+                // Solo usuarios con rol 'ADMIN' pueden acceder
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/perfil/**").authenticated()
+                // --- CUALQUIER OTRA RUTA ---
+                // Todas las demás URLs requieren que el usuario esté autenticado
+                .anyRequest().authenticated())
+                // La configuración de formLogin se encarga de la redirección automática
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll());
 
-    return http.build();
-}
+        return http.build();
+    }
 }

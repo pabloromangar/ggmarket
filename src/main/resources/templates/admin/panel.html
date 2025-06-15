@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <!-- Usamos el fragmento head para consistencia (CSS, viewport, etc.) -->
+    <div th:replace="~{fragments/header :: head(pageTitle='Panel de Administración')}"></div>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
+
+    <main class="container my-5 flex-grow-1">
+        <h1 class="display-5 fw-bold mb-4">Panel de Administración</h1>
+        <p class="lead mb-5">Desde aquí puedes gestionar los diferentes aspectos de la plataforma.</p>
+
+        <!-- 
+          Usamos una fila (row) para organizar las tarjetas de gestión.
+          Es responsive: se apilará en móvil y se mostrará en columnas en escritorio.
+        -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+            <!-- Card 1: Gestión de Usuarios -->
+            <div class="col">
+                <div class="card h-100 text-white border-secondary">
+                    <div class="card-body bg-primary text-center d-flex flex-column">
+                        <i class="bi bi-people-fill fs-1 text-light mb-3"></i>
+                        <h5 class="card-title">Gestión de Usuarios</h5>
+                        <p class="card-text flex-grow-1">Ver, editar y gestionar los roles de todos los usuarios registrados en la plataforma.</p>
+                        <a th:href="@{/admin/usuarios}" class="btn btn-light mt-auto">Ir a Usuarios</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Gestión de Productos Digitales -->
+            <div class="col">
+                <div class="card h-100 bg-dark text-white border-secondary">
+                    <div class="card-body text-center d-flex flex-column">
+                        <i class="bi bi-joystick fs-1 text-dark mb-3"></i>
+                        <h5 class="card-title text-dark">Productos Digitales</h5>
+                        <p class="card-text flex-grow-1 text-dark">Añadir, editar, eliminar e importar claves para los productos digitales que vende la tienda.</p>
+                        <a th:href="@{/admin/productos}" class="btn btn-secondary mt-auto">Ir a Productos</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 3: Gestión de Productos Físicos (Marketplace) -->
+            <div class="col">
+                <div class="card h-100 bg-dark text-white border-secondary">
+                    <div class="card-body bg-primary text-center d-flex flex-column">
+                        <i class="bi bi-box-seam-fill fs-1 text-warning mb-3"></i>
+                        <h3 class="text-dark">En mantenimiento...</h3>
+                        <h5 class="card-title">Moderar Marketplace</h5>
+                        <p class="card-text flex-grow-1">Supervisar y moderar los productos físicos que los vendedores listan en el marketplace.</p>
+                        <!-- Este enlace apunta a una futura página -->
+                        <a href="#" class="btn btn-outline-warning mt-auto disabled">Moderar Productos</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Gestión de Pedidos -->
+            <div class="col">
+                <div class="card h-100 bg-dark text-white border-secondary">
+                    <div class="card-body text-center d-flex flex-column">
+                        <i class="bi bi-receipt-cutoff fs-1 text-info mb-3"></i>
+                        <h3 class="text-dark">En mantenimiento...</h3>
+
+                        <h5 class="card-title text-dark">Ver Pedidos</h5>
+                        <p class="card-text text-dark flex-grow-1">Consultar el historial completo de todos los pedidos realizados en la plataforma, tanto digitales como físicos.</p>
+                        <a href="#" class="btn btn-outline-info mt-auto disabled">Ver todos los Pedidos</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer y Scripts estándar -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

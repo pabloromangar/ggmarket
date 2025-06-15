@@ -51,4 +51,6 @@ public class ProductoService {
     public void eliminarProductoFisico(Long id) {
         fisicoRepo.deleteById(id);
     }
+
+    
 }

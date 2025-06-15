@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Usamos nuestro fragmento de head para mantener la consistencia -->
+    <div th:replace="~{fragments/header :: head(pageTitle='Acceso Denegado')}"></div>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-dark text-white">
+
+    <!-- Navbar estándar -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 
+      Contenido principal centrado vertical y horizontalmente.
+      'my-auto' centra verticalmente el contenido dentro del contenedor flex del body.
+    -->
+    <main class="container text-center my-auto">
+        <div class="py-5">
+            <!-- Un icono grande y claro para el tipo de error -->
+            <i class="bi bi-shield-lock-fill text-danger" style="font-size: 6rem;"></i>
+            
+            <h1 class="display-4 fw-bold mt-3">Error 403</h1>
+            <h2 class="display-6">Acceso Denegado</h2>
+            
+            <div class="col-lg-6 mx-auto">
+                <p class="lead mt-4 mb-4">
+                    Lo sentimos, pero no tienes los permisos necesarios para acceder a esta página.
+                    Es posible que necesites un rol diferente (como Administrador o Vendedor) para ver este contenido.
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <!-- Botones de acción para guiar al usuario -->
+                    <a th:href="@{/}" class="btn btn-primary btn-lg px-4 gap-3">Volver a la Página Principal</a>
+                    <a th:href="@{/logout}" class="btn btn-outline-secondary btn-lg px-4">Iniciar sesión como otro usuario</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer y Scripts estándar -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

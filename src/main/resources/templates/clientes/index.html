@@ -1,106 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- El fragmento head es perfecto -->
-    <div th:replace="~{fragments/header :: head(pageTitle=${pageTitle})}"></div>
+    <div th:replace="~{fragments/header :: head(pageTitle='GGMarket - Tu Tienda de Claves Digitales')}"></div>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-primary text-white">
-    <!-- El fragmento de header responsive está perfecto -->
+    
+    <!-- Header y Offcanvas del Carrito -->
     <div th:replace="~{fragments/header :: header}"></div>
     <div th:replace="~{fragments/cart-offcanvas :: cartOffcanvas}"></div>
 
-    <nav class="nav container flex-nowrap justify-content-around py-2 bg-primary overflow-x-auto my-3">
-        <a href="#" class="nav-link text-center text-white">
-            <i class="bi bi-controller fs-4"></i><br>
-            <small>Juegos</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 150px;">
-            <i class="bi bi-card-heading fs-4"></i><br>
-            <small>Tarjetas de juego</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-credit-card-2-front fs-4"></i><br>
-            <small>Recarga</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-windows fs-4"></i><br>
-            <small>Windows</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-steam fs-4"></i><br>
-            <small>Steam</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-playstation fs-4"></i><br>
-            <small>PSN</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-xbox fs-4"></i><br>
-            <small>Xbox</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-google-play fs-4"></i><br>
-            <small>Google Play</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-apple fs-4"></i><br>
-            <small>Apple</small>
-        </a>
-        <a href="#" class="nav-link text-center text-white" style="min-width: 100px;">
-            <i class="bi bi-spotify fs-4"></i><br>
-            <small>Spotify</small>
-        </a>
+    <!-- Barra de Iconos de Categorías -->
+    <nav class="nav container flex-nowrap justify-content-around py-2 bg-primary overflow-x-auto my-3 rounded">
+        <a th:href="@{/tienda/tipo/juego}" class="nav-link text-center text-white"><i class="bi bi-controller fs-4"></i><br><small>Juegos</small></a>
+        <a th:href="@{/tienda/tipo/tarjeta}" class="nav-link text-center text-white" style="min-width: 150px;"><i class="bi bi-card-heading fs-4"></i><br><small>Tarjetas</small></a>
+        <a th:href="@{/tienda/tipo/software}" class="nav-link text-center text-white" style="min-width: 100px;"><i class="bi bi-windows fs-4"></i><br><small>Windows</small></a>
+        <a th:href="@{/tienda/plataforma/steam}" class="nav-link text-center text-white" style="min-width: 100px;"><i class="bi bi-steam fs-4"></i><br><small>Steam</small></a>
+        <a th:href="@{/tienda/plataforma/psn}" class="nav-link text-center text-white" style="min-width: 100px;"><i class="bi bi-playstation fs-4"></i><br><small>PSN</small></a>
+        <a th:href="@{/tienda/plataforma/xbox}" class="nav-link text-center text-white" style="min-width: 100px;"><i class="bi bi-xbox fs-4"></i><br><small>Xbox</small></a>
     </nav>
     
-    <!-- ============ INICIO DEL CONTENIDO PRINCIPAL ============ -->
+    <!-- 
+      ==============================================================
+                          CONTENIDO PRINCIPAL
+      ==============================================================
+    -->
     <main class="container my-4 flex-grow-1">
 
-        <!-- ===== SECCIÓN 1: JUEGOS BARATOS ===== -->
+        <!-- SECCIÓN 1: JUEGOS BARATOS -->
         <section class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="mb-0">Juegos en Oferta</h2>
-                <a href="#" class="btn btn-outline-light">Ver más</a>
+                <a th:href="@{/tienda/tipo/juego}" class="btn btn-outline-light">Ver más</a>
             </div>
-            <!-- El 'th:if' asegura que la fila solo se muestre si hay productos -->
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:if="${!juegosBaratos.isEmpty()}">
-                <!-- Iteramos sobre la lista 'juegosBaratos' del modelo -->
                 <th:block th:each="producto : ${juegosBaratos}">
-                    <!-- Usamos nuestro nuevo fragmento de tarjeta -->
                     <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
                 </th:block>
             </div>
         </section>
 
-        <!-- ===== SECCIÓN 2: TARJETAS DE SALDO ===== -->
+        <!-- SECCIÓN 2: TARJETAS DE SALDO -->
         <section class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="mb-0">Tarjetas de Saldo y Recargas</h2>
-                <a href="#" class="btn btn-outline-light">Ver más</a>
+                <a th:href="@{/tienda/tipo/tarjeta}" class="btn btn-outline-light">Ver más</a>
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:if="${!tarjetas.isEmpty()}">
-                <!-- Iteramos sobre la lista 'tarjetas' del modelo -->
                 <th:block th:each="producto : ${tarjetas}">
                     <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
                 </th:block>
             </div>
         </section>
 
-        <!-- ===== SECCIÓN 3: CÓDIGOS DE SOFTWARE ===== -->
+        <!-- SECCIÓN 3: CÓDIGOS DE SOFTWARE -->
         <section class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="mb-0">Software y Windows</h2>
-                <a href="#" class="btn btn-outline-light">Ver más</a>
+                <a th:href="@{/tienda/tipo/software}" class="btn btn-outline-light">Ver más</a>
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" th:if="${!software.isEmpty()}">
-                <!-- Iteramos sobre la lista 'software' del modelo -->
                 <th:block th:each="producto : ${software}">
                     <div th:replace="~{fragments/card-producto :: producto-card(producto=${producto})}"></div>
                 </th:block>
             </div>
         </section>
 
-    </main>
-    <!-- ============ FIN DEL CONTENIDO PRINCIPAL ============ -->
+    </main> <!-- ¡¡¡ ESTA ES LA ETIQUETA DE CIERRE QUE FALTABA !!! -->
+    <!-- ============================================================== -->
 
     <div th:replace="~{fragments/footer :: footer}"></div>
     <div th:replace="~{fragments/scripts :: scripts}"></div>
